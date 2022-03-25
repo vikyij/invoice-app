@@ -4,7 +4,7 @@ import userAvatar from '../../assets/images/image-avatar.jpg'
 
 const Header = () => {
   return (
-    <div className='w-full h-20 bg-dark-blue flex justify-between'>
+    <header className='w-full h-20 bg-dark-blue flex justify-between'>
       <img src={ovalIcon} alt='left side header svg' />
 
       <div className='flex items-center'>
@@ -16,7 +16,7 @@ const Header = () => {
           alt='user avatar'
         />
       </div>
-    </div>
+    </header>
   )
 }
 
