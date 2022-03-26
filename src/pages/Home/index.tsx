@@ -1,7 +1,30 @@
+import { useState, useEffect } from 'react'
+import classNames from 'classnames'
 import downArrow from '../../assets/images/icon-arrow-down.svg'
 import plusIcon from '../../assets/images/icon-plus.svg'
+import EmptyState from '../../components/EmptyState'
+import data from './data'
+import { formatAmount, formatDate } from '../../utils/index'
+
+interface Data {
+  id: string
+  paymentDue: string
+  clientName: string
+  status: string
+  total: number
+}
 
 const Home = () => {
+  const [invoiceData, setInvoiceData] = useState<Data[]>([])
+
+  const setData = () => {
+    const timeout = setTimeout(() => setInvoiceData(data), 2000)
+
+    return () => clearTimeout(timeout)
+  }
+
+  useEffect(() => setData(), [])
+
   return (
     <div className='bg-light-purple px-5 py-8'>
       <div className='flex justify-between items-center mb-8'>
@@ -22,7 +45,7 @@ const Home = () => {
               alt='filter-dropdown-icon'
             />
           </div>
-          <div className='w-20 h-10 rounded-3xl bg-purple flex items-center'>
+          <div className='w-[90px] h-10 rounded-3xl bg-purple flex items-center'>
             <div className='w-8 h-8 bg-white rounded-3xl ml-1.5 mr-1.5'>
               <img
                 src={plusIcon}
@@ -34,32 +57,66 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {[...Array(5)].map((invoice) => {
-        return (
-          <div className='w-full h-32 rounded-lg bg-white mt-4 p-4 py-6'>
-            <div className='flex justify-between'>
-              <p className='font-bold text-sm text-semi-black'>
-                <span className='text-dark-grey'>#</span>RT3080
-              </p>
-              <p className='font-bold text-sm text-dark-grey'>Jensen Huang</p>
-            </div>
-            <div className='flex justify-between mt-5'>
-              <div>
-                <p className='font-medium text-sm text-dark-grey'>
-                  Due 19 Aug 2021
+
+      {invoiceData.length === 0 ? (
+        <EmptyState />
+      ) : (
+        invoiceData.map((invoice) => {
+          return (
+            <div
+              className='w-full h-36 rounded-lg bg-white mt-4 p-4 py-6'
+              key={invoice.id}
+            >
+              <div className='flex justify-between'>
+                <p className='font-bold text-sm text-semi-black'>
+                  <span className='text-dark-grey'>#</span>
+                  {invoice.id}
                 </p>
-                <h2 className='font-bold text-base text-semi-black'>
-                  £ 1,800.90
-                </h2>
+                <p className='font-bold text-sm text-dark-grey'>
+                  {invoice.clientName}
+                </p>
               </div>
-              <div className='w-24 h-10 rounded-md bg-light-green flex items-center justify-center'>
-                <span className='bg-green w-2 h-2 rounded-3xl mr-2'></span>
-                <p className='text-green font-bold text-md'>Paid</p>
+              <div className='flex justify-between mt-5'>
+                <div>
+                  <p className='font-medium text-sm text-dark-grey'>
+                    {`Due ${formatDate(invoice.paymentDue)}`}
+                  </p>
+                  <h2 className='font-bold text-base text-semi-black'>
+                    {formatAmount(invoice.total)}
+                  </h2>
+                </div>
+                <div
+                  className={classNames(
+                    'w-24 h-10 rounded-md flex items-center justify-center',
+                    {
+                      'bg-[#F4FDFA]': invoice.status === 'paid',
+                      'bg-[#FFF9F0]': invoice.status === 'pending',
+                      'bg-[#F4F4F5]': invoice.status === 'draft',
+                    }
+                  )}
+                >
+                  <span
+                    className={classNames('w-2 h-2 rounded-3xl mr-2', {
+                      'bg-green': invoice.status === 'paid',
+                      'bg-orange': invoice.status === 'pending',
+                      'bg-dark-blue': invoice.status === 'draft',
+                    })}
+                  ></span>
+                  <p
+                    className={classNames('font-bold text-md', {
+                      'text-green': invoice.status === 'paid',
+                      'text-orange': invoice.status === 'pending',
+                      'text-dark-blue': invoice.status === 'draft',
+                    })}
+                  >
+                    {invoice.status}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })
+      )}
     </div>
   )
 }
