@@ -4,21 +4,44 @@ import plusIcon from '../../assets/images/icon-plus.svg'
 import EmptyState from '../../components/EmptyState'
 import Status from '../../components/Status'
 import InvoiceDetails from '../../components/InvoiceDetails'
+import NewInvoice from '../../components/NewInvoice'
 import data from './data'
-import { formatAmount, formatDate } from '../../utils/index'
+import { formatAmount, formatDate } from '../../utils/index.js'
 
 interface Data {
+  status: string
   id: string
+  description: string
+  senderAddress: {
+    street: string
+    city: string
+    postCode: string
+    country: string
+  }
+  createdAt: string
   paymentDue: string
   clientName: string
-  status: string
+  clientAddress: {
+    street: string
+    city: string
+    postCode: string
+    country: string
+  }
+  clientEmail: string
+  items: {
+    name: string
+    quantity: number
+    price: number
+    total: number
+  }[]
   total: number
 }
 
 const Home = () => {
   const [invoiceData, setInvoiceData] = useState<Data[]>([])
   const [showDetails, setShowDetails] = useState(false)
-  const [singleDetail, setSingleDetail] = useState({})
+  const [singleDetail, setSingleDetail] = useState<Data>()
+  const [showNewInvoice, setShowNewInvoice] = useState(false)
 
   const setData = () => {
     const timeout = setTimeout(() => setInvoiceData(data), 2000)
@@ -40,6 +63,8 @@ const Home = () => {
           details={singleDetail}
           goBack={() => setShowDetails(false)}
         />
+      ) : showNewInvoice ? (
+        <NewInvoice goBack={() => setShowNewInvoice(false)} />
       ) : (
         <div className='bg-light-purple px-5 py-8'>
           <div className='flex justify-between items-center mb-8'>
@@ -60,7 +85,10 @@ const Home = () => {
                   alt='filter-dropdown-icon'
                 />
               </div>
-              <div className='w-[90px] h-10 rounded-3xl bg-purple flex items-center'>
+              <div
+                className='w-[90px] h-10 rounded-3xl bg-purple flex items-center cursor-pointer'
+                onClick={() => setShowNewInvoice(true)}
+              >
                 <div className='w-8 h-8 bg-white rounded-3xl ml-1.5 mr-1.5'>
                   <img
                     src={plusIcon}
