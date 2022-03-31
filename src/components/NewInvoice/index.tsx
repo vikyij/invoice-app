@@ -1,3 +1,5 @@
+import React, { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { formatAmount } from '../../utils/index.js'
 import deleteIcon from '../../assets/images/icon-delete.svg'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
@@ -7,6 +9,29 @@ interface NewInvoiceProps {
 }
 
 const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
+  const [itemList, setItemList] = useState([
+    {
+      id: uuidv4(),
+      name: '',
+      qty: '',
+      price: '',
+      total: '',
+    },
+  ])
+
+  const addNewItem = () => {
+    setItemList((prev) => [
+      ...prev,
+      {
+        id: uuidv4(),
+        name: '',
+        qty: '',
+        price: '',
+        total: '',
+      },
+    ])
+  }
+
   return (
     <div>
       <div className='flex px-5 pt-8'>
@@ -216,65 +241,77 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
 
         <section className='mt-10 px-5'>
           <p className='font-bold text-lg text-[#777F98]'>Item List</p>
-          <div className='mt-4 mb-2'>
-            <label
-              htmlFor='item-name'
-              className='font-normal text-xs text-grey-purple'
-            >
-              Item Name
-            </label>
-            <input
-              type='text'
-              name='item-name'
-              id='item-name'
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
-            />
-          </div>
-          <div className='mt-5 mb-2 flex justify-between'>
-            <div className='flex flex-col'>
-              <label
-                htmlFor='quantity'
-                className='font-normal text-xs text-grey-purple'
-              >
-                Qty.
-              </label>
-              <input
-                type='text'
-                name='quantity'
-                id='quantity'
-                className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-16 mt-2 p-4'
-              />
-            </div>
+          {itemList.map((item) => {
+            return (
+              <div className='mb-8'>
+                <div className='mt-4 mb-2'>
+                  <label
+                    htmlFor='item-name'
+                    className='font-normal text-xs text-grey-purple'
+                  >
+                    Item Name
+                  </label>
+                  <input
+                    type='text'
+                    name='item-name'
+                    id='item-name'
+                    className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+                  />
+                </div>
+                <div className='mt-5 mb-2 flex justify-between'>
+                  <div className='flex flex-col'>
+                    <label
+                      htmlFor='quantity'
+                      className='font-normal text-xs text-grey-purple'
+                    >
+                      Qty.
+                    </label>
+                    <input
+                      type='text'
+                      name='quantity'
+                      id='quantity'
+                      className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-16 mt-2 p-4'
+                    />
+                  </div>
 
-            <div className='flex flex-col'>
-              <label
-                htmlFor='price'
-                className='font-normal text-xs text-grey-purple'
-              >
-                Price
-              </label>
-              <input
-                type='text'
-                name='price'
-                id='price'
-                className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[100px] mt-2 p-4'
-              />
-            </div>
+                  <div className='flex flex-col'>
+                    <label
+                      htmlFor='price'
+                      className='font-normal text-xs text-grey-purple'
+                    >
+                      Price
+                    </label>
+                    <input
+                      type='text'
+                      name='price'
+                      id='price'
+                      className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[100px] mt-2 p-4'
+                    />
+                  </div>
 
-            <div className='flex flex-col'>
-              <p className='font-normal text-xs text-grey-purple'>Total</p>
-              <p className='font-bold text-xs text-dark-grey mt-6'>
-                {formatAmount(156)}
-              </p>
-            </div>
-            <div className='mt-10'>
-              <img src={deleteIcon} alt='delete-item' />
-            </div>
-          </div>
+                  <div className='flex flex-col'>
+                    <p className='font-normal text-xs text-grey-purple'>
+                      Total
+                    </p>
+                    <p className='font-bold text-xs text-dark-grey mt-6'>
+                      {formatAmount(156)}
+                    </p>
+                  </div>
+                  <div className='mt-10'>
+                    <img src={deleteIcon} alt='delete-item' />
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </section>
 
         <div className='px-5'>
-          <button className='w-full h-12 font-bold text-xs text-grey-purple mt-8 bg-[#F9FAFE] rounded-3xl'>
+          <button
+            type='button'
+            className='w-full h-12 font-bold text-xs text-grey-purple mt-8 bg-[#F9FAFE] rounded-3xl'
+            onClick={addNewItem}
+          >
             + Add New Item
           </button>
         </div>
