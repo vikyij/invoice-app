@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 
 interface StatusProps {
-  status: string
+  status?: string
 }
 
 const Status: React.FC<StatusProps> = ({ status }) => {
