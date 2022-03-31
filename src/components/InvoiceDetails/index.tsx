@@ -1,4 +1,7 @@
+import { useState } from 'react'
+
 import Status from '../Status'
+import Modal from '../Modal'
 import { formatDate, formatAmount } from '../../utils/index.js'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
 
@@ -38,6 +41,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps | undefined> = ({
   details,
   goBack,
 }) => {
+  const [deleteInvoice, setDeleteInvoice] = useState(false)
+
   return (
     <>
       <div className='bg-light-purple px-5 py-8'>
@@ -143,13 +148,42 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps | undefined> = ({
         <button className='font-bold text-xs text-grey-purple bg-[#F9FAFE] rounded-3xl w-[73px] h-12'>
           Edit
         </button>
-        <button className='font-bold text-xs text-white bg-[#EC5757] rounded-3xl w-[89px] h-12'>
+        <button
+          className='font-bold text-xs text-white bg-[#EC5757] rounded-3xl w-[89px] h-12'
+          onClick={() => setDeleteInvoice(true)}
+        >
           Delete
         </button>
         <button className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[149px] h-12'>
           Mark as Paid
         </button>
       </footer>
+
+      {deleteInvoice && (
+        <Modal
+          handleClose={() => setDeleteInvoice(false)}
+          width='327px'
+          height='220px'
+        >
+          <div className='bg-white p-6 rounded-md'>
+            <p className='font-bold text-xl text-semi-black'>
+              Confirm Deletion
+            </p>
+            <p className='font-normal text-xs text-dark-grey mt-3'>{`Are you sure you want to delete invoice #${details?.id}? This action cannot be undone.`}</p>
+            <div className='mt-6 flex justify-end'>
+              <button
+                className='font-bold text-xs text-grey-purple bg-[#F9FAFE] rounded-3xl w-[91px] h-12 mr-2'
+                onClick={() => setDeleteInvoice(false)}
+              >
+                Cancel
+              </button>
+              <button className='font-bold text-xs text-white bg-[#EC5757] rounded-3xl w-[89px] h-12'>
+                Delete
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   )
 }
