@@ -7,41 +7,18 @@ import InvoiceDetails from '../../components/InvoiceDetails'
 import NewInvoice from '../../components/NewInvoice'
 import data from './data'
 import { formatAmount, formatDate } from '../../utils/index.js'
-
-interface Data {
-  status: string
-  id: string
-  description: string
-  senderAddress: {
-    street: string
-    city: string
-    postCode: string
-    country: string
-  }
-  createdAt: string
-  paymentDue: string
-  clientName: string
-  clientAddress: {
-    street: string
-    city: string
-    postCode: string
-    country: string
-  }
-  clientEmail: string
-  items: {
-    name: string
-    quantity: number
-    price: number
-    total: number
-  }[]
-  total: number
-}
+import { InvoiceData } from '../../redux/interfaces/invoice'
+import { useSelector } from 'react-redux'
+import { AppState } from '../../redux/store'
 
 const Home = () => {
-  const [invoiceData, setInvoiceData] = useState<Data[]>([])
+  const [invoiceData, setInvoiceData] = useState<InvoiceData[]>([])
   const [showDetails, setShowDetails] = useState(false)
-  const [singleDetail, setSingleDetail] = useState<Data>()
+  const [singleDetail, setSingleDetail] = useState<InvoiceData>()
   const [showNewInvoice, setShowNewInvoice] = useState(false)
+
+  const invoices = useSelector((state: AppState) => state.invoices)
+  console.log(invoices)
 
   const setData = () => {
     const timeout = setTimeout(() => setInvoiceData(data), 2000)
@@ -49,7 +26,7 @@ const Home = () => {
     return () => clearTimeout(timeout)
   }
 
-  const handleShowDetails = (invoice: Data) => {
+  const handleShowDetails = (invoice: InvoiceData) => {
     setShowDetails(true)
     setSingleDetail(invoice)
   }

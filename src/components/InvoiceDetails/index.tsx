@@ -4,36 +4,10 @@ import Status from '../Status'
 import Modal from '../Modal'
 import { formatDate, formatAmount } from '../../utils/index.js'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
+import { InvoiceData } from '../../redux/interfaces/invoice'
 
 interface InvoiceDetailsProps {
-  details?: {
-    status: string
-    id: string
-    description: string
-    senderAddress: {
-      street: string
-      city: string
-      postCode: string
-      country: string
-    }
-    createdAt: string | undefined
-    paymentDue: string | undefined
-    clientName: string
-    clientAddress: {
-      street: string
-      city: string
-      postCode: string
-      country: string
-    }
-    clientEmail: string
-    items: {
-      name: string
-      quantity: number
-      price: number
-      total: number
-    }[]
-    total: number
-  }
+  details?: InvoiceData
   goBack: () => void
 }
 
