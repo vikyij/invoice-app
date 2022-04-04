@@ -4,6 +4,11 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { formatAmount } from '../../utils/index.js'
 import deleteIcon from '../../assets/images/icon-delete.svg'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
+import { getInvoiceAction } from '../../redux/actions/InvoiceActions'
+import { useDispatch } from 'react-redux'
+import { InvoiceActionTypes } from '../../redux/types/InvoiceTypes'
+import { InvoiceData } from '../../redux/interfaces/invoice'
+
 
 interface NewInvoiceProps {
   goBack: () => void
@@ -36,15 +41,17 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
   ])
   const [itemErrorMsg, setItemErrorMsg] = useState('')
 
-  console.log(itemList)
-
+  // console.log(itemList)
+  const dispatch = useDispatch()
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>()
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data)
+    //  console.log(data)
+    let arr = [data]
+    dispatch(getInvoiceAction(arr))
   }
 
   const addNewItem = () => {
