@@ -4,54 +4,53 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { formatAmount } from '../../utils/index.js'
 import deleteIcon from '../../assets/images/icon-delete.svg'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
-import { getInvoiceAction } from '../../redux/actions/InvoiceActions'
 import { useDispatch } from 'react-redux'
-import { InvoiceActionTypes } from '../../redux/types/InvoiceTypes'
 import { InvoiceData } from '../../redux/interfaces/invoice'
-
+import { addNewInvoice,getInvoices } from '../../redux/effect/invoice'
 
 interface NewInvoiceProps {
   goBack: () => void
 }
 
-type Inputs = {
-  clientName: string
-  clientCity: string
-  address: string
-  city: string
-  postCode: string
-  country: string
-  clientEmail: string
-  clientAddress: string
-  clientPostCode: string
-  paymentTerms: string
-  projectDescription: string
-  invoiceDate: Date
+interface Items {
+  id: string
+  name: string
+  quantity: string
+  price: string
+  total: number
 }
 
 const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
-  const [itemList, setItemList] = useState([
+  const [itemList, setItemList] = useState<Items[]>([
     {
       id: uuidv4(),
-      itemName: '',
+      name: '',
       quantity: '',
       price: '',
       total: 0,
     },
   ])
-  const [itemErrorMsg, setItemErrorMsg] = useState('')
 
-  // console.log(itemList)
   const dispatch = useDispatch()
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>()
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    //  console.log(data)
-    let arr = [data]
-    dispatch(getInvoiceAction(arr))
+  } = useForm<InvoiceData>()
+
+  const onSubmit: SubmitHandler<InvoiceData> = (data) => {
+    let total = itemList.reduce((total, item) => total + item.total, 0)
+
+    let invoiceDate = new Date(data.createdAt)
+    let length = parseInt(data.paymentTerms)
+    let dueDate = new Date(invoiceDate.setDate(invoiceDate.getDate() + length))
+
+    data.items = itemList
+    data.total = total
+    data.paymentDue = dueDate
+    data.status='pending'
+    dispatch(addNewInvoice(data))
+    dispatch(getInvoices())
   }
 
   const addNewItem = () => {
@@ -59,7 +58,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
       ...prev,
       {
         id: uuidv4(),
-        itemName: '',
+        name: '',
         quantity: '',
         price: '',
         total: 0,
@@ -106,12 +105,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='address'
-              {...register('address', { required: 'Enter your address' })}
+              {...register('senderAddress.street', {
+                required: 'Enter your address',
+              })}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.address && (
+            {errors.senderAddress?.street && (
               <span className='mt-5  text-xs text-[red]'>
-                {errors.address.message}
+                {errors.senderAddress.street.message}
               </span>
             )}
           </div>
@@ -125,13 +126,15 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
               </label>
               <input
                 type='text'
-                {...register('city', { required: 'Enter your city' })}
+                {...register('senderAddress.city', {
+                  required: 'Enter your city',
+                })}
                 id='city'
                 className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
               />
-              {errors.city && (
+              {errors?.senderAddress?.city && (
                 <span className='mt-5  text-xs text-[red]'>
-                  {errors.city.message}
+                  {errors.senderAddress.city.message}
                 </span>
               )}
             </div>
@@ -146,7 +149,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
               <input
                 type='text'
                 id='post-code'
-                {...register('postCode')}
+                {...register('senderAddress.postCode')}
                 className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
               />
             </div>
@@ -161,12 +164,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='country'
-              {...register('country', { required: 'Enter your country' })}
+              {...register('senderAddress.country', {
+                required: 'Enter your country',
+              })}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.country && (
+            {errors.senderAddress?.country && (
               <span className='mt-5  text-xs text-[red]'>
-                {errors.country.message}
+                {errors.senderAddress.country.message}
               </span>
             )}
           </div>
@@ -229,14 +234,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='client-address'
-              {...register('clientAddress', {
+              {...register('clientAddress.street', {
                 required: "Enter Client's address",
               })}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.clientAddress && (
+            {errors.clientAddress?.street && (
               <span className='mt-5  text-xs text-[red]'>
-                {errors.clientAddress.message}
+                {errors.clientAddress.street.message}
               </span>
             )}
           </div>
@@ -251,12 +256,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
               <input
                 type='text'
                 id='client-city'
-                {...register('clientCity', { required: "Enter Client's city" })}
+                {...register('clientAddress.city', {
+                  required: "Enter Client's city",
+                })}
                 className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
               />
-              {errors.clientCity && (
+              {errors.clientAddress?.city && (
                 <span className='mt-5  text-xs text-[red]'>
-                  {errors.clientCity.message}
+                  {errors.clientAddress.city.message}
                 </span>
               )}
             </div>
@@ -271,7 +278,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
               <input
                 type='text'
                 id='client-post-code'
-                {...register('clientPostCode')}
+                {...register('clientAddress.postCode')}
                 className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
               />
             </div>
@@ -286,12 +293,12 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='date'
               id='invoice-date'
-              {...register('invoiceDate', { required: 'Enter Invoice Date' })}
+              {...register('createdAt', { required: 'Enter Invoice Date' })}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.invoiceDate && (
+            {errors.createdAt && (
               <span className='mt-5  text-xs text-[red]'>
-                {errors.invoiceDate.message}
+                {errors.createdAt.message}
               </span>
             )}
           </div>
@@ -324,15 +331,15 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='project-description'
-              {...register('projectDescription', {
+              {...register('description', {
                 required: 'Enter project description',
               })}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
 
-            {errors.projectDescription && (
+            {errors.description && (
               <span className='mt-5  text-xs text-[red]'>
-                {errors.projectDescription.message}
+                {errors.description.message}
               </span>
             )}
           </div>
@@ -354,9 +361,9 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                     type='text'
                     id='item-name'
                     name='itemName'
-                    value={item.itemName}
+                    value={item.name}
                     onChange={(event) => {
-                      item.itemName = event.target.value
+                      item.name = event.target.value
                       setItemList([...itemList])
                     }}
                     className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'

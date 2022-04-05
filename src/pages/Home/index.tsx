@@ -5,33 +5,32 @@ import EmptyState from '../../components/EmptyState'
 import Status from '../../components/Status'
 import InvoiceDetails from '../../components/InvoiceDetails'
 import NewInvoice from '../../components/NewInvoice'
-import data from './data'
 import { formatAmount, formatDate } from '../../utils/index.js'
 import { InvoiceData } from '../../redux/interfaces/invoice'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { AppState } from '../../redux/store'
+import { getInvoices } from '../../redux/effect/invoice'
 
 const Home = () => {
-  const [invoiceData, setInvoiceData] = useState<InvoiceData[]>([])
+  const [invoiceData, setInvoiceData] = useState({ invoices: [] })
   const [showDetails, setShowDetails] = useState(false)
   const [singleDetail, setSingleDetail] = useState<InvoiceData>()
   const [showNewInvoice, setShowNewInvoice] = useState(false)
 
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getInvoices())
+  }, [dispatch])
+
   const invoices = useSelector((state: AppState) => state.invoices)
-  console.log(invoices)
-
-  const setData = () => {
-    const timeout = setTimeout(() => setInvoiceData(data), 2000)
-
-    return () => clearTimeout(timeout)
-  }
 
   const handleShowDetails = (invoice: InvoiceData) => {
     setShowDetails(true)
     setSingleDetail(invoice)
   }
 
-  useEffect(() => setData(), [])
+  useEffect(() => setInvoiceData(invoices), [invoices])
 
   return (
     <>
@@ -50,7 +49,7 @@ const Home = () => {
                 Invoices
               </h1>
               <p className='text-dark-grey tracking-tight text-xs font-medium'>
-                {invoiceData.length} invoices
+                {invoiceData?.invoices?.length} invoices
               </p>
             </div>
             <div className='flex'>
@@ -78,10 +77,10 @@ const Home = () => {
             </div>
           </div>
           <>
-            {invoiceData.length === 0 ? (
+            {invoiceData?.invoices.length === 0 ? (
               <EmptyState />
             ) : (
-              invoiceData.map((invoice) => {
+              invoiceData?.invoices?.map((invoice: InvoiceData) => {
                 return (
                   <div
                     className='w-full h-36 rounded-lg bg-white mt-4 p-4 py-6 cursor-pointer'
