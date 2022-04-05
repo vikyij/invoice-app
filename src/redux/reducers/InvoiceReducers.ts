@@ -4,7 +4,7 @@ import {
   InvoiceActionTypes
 } from '../types/InvoiceTypes';
 
-const initialStateGetInvoices: GetInvoiceStateType = {
+const initialStateGetInvoices = {
   invoices: []
 };
 

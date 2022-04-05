@@ -8,8 +8,8 @@ export interface InvoiceData {
     postCode: string
     country: string
   }
-  createdAt: string
-  paymentDue: string
+  createdAt: Date
+  paymentDue: Date
   clientName: string
   clientAddress: {
     street: string
@@ -19,12 +19,14 @@ export interface InvoiceData {
   }
   clientEmail: string
   items: {
+    id: string
     name: string
-    quantity: number
-    price: number
+    quantity: string
+    price: string
     total: number
   }[]
   total: number
+  paymentTerms: string
 }
 
 export type Inputs = {
