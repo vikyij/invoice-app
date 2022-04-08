@@ -1,10 +1,11 @@
-import { GET_INVOICES,
+import { invoiceStateTypes,
   InvoiceActionTypes } from '../types/InvoiceTypes';
-import { InvoiceData, Inputs } from '../interfaces/invoice';
+import { InvoiceData, } from '../interfaces/invoice';
 
-export const getInvoiceAction = (invoices: InvoiceData[]): InvoiceActionTypes => {
+export const getInvoiceAction = ( type: invoiceStateTypes, loading?: boolean,invoices?: InvoiceData[]): InvoiceActionTypes => {
   return {
-    type: GET_INVOICES,
-    payload: invoices
+    type: type,
+    invoicePayload: invoices,
+    loadingPayload: loading
   };
 };

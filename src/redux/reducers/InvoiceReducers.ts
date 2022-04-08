@@ -1,11 +1,12 @@
 import {
-  GET_INVOICES,
+  invoiceStateTypes,
   GetInvoiceStateType,
-  InvoiceActionTypes
+  InvoiceActionTypes,
 } from '../types/InvoiceTypes';
 
 const initialStateGetInvoices = {
-  invoices: []
+  invoices: [],
+  loading: false,
 };
 
 export const getInvoiceReducer = (
@@ -13,11 +14,16 @@ export const getInvoiceReducer = (
   action: InvoiceActionTypes
 ): GetInvoiceStateType => {
   switch (action.type) {
-    case GET_INVOICES:
+    case invoiceStateTypes.GET_INVOICES:
       return {
         ...state,
-        invoices: action.payload
+        invoices: action.invoicePayload
       };
+    case invoiceStateTypes.LOADING: 
+    return {
+       ...state,
+       loading: action.loadingPayload
+    }
     default:
       return state;
   }

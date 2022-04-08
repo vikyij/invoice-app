@@ -1,28 +1,34 @@
 import { getInvoiceAction } from '../actions/InvoiceActions';
 import { Dispatch } from 'redux';
-import { InvoiceActionTypes } from '../types/InvoiceTypes';
+import { InvoiceActionTypes, invoiceStateTypes } from '../types/InvoiceTypes';
 import { InvoiceData } from '../interfaces/invoice'
 
 export const getInvoices = () => {
   return function (dispatch: Dispatch<InvoiceActionTypes>) {
+    dispatch(getInvoiceAction(invoiceStateTypes.LOADING,true))
     fetch('http://localhost:3000/invoices')
       .then(res => res.json())
       .then(data => {
-        dispatch(getInvoiceAction(data.reverse()));        
+        dispatch(getInvoiceAction(invoiceStateTypes.LOADING, false))
+        dispatch(getInvoiceAction(invoiceStateTypes.GET_INVOICES,false,data.reverse()))
         return data;
       });
   };
 };
 
 export const addNewInvoice = (data: InvoiceData) => {
-  return function () {
+  return function (dispatch: Dispatch<InvoiceActionTypes>) {
+    dispatch(getInvoiceAction(invoiceStateTypes.LOADING, true))
+
     fetch('http://localhost:3000/invoices', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data)
     }).then(res => res.json())
     .then(data => {
-      console.log(data);
+      const loadingTimeOut = setTimeout(() => dispatch(getInvoiceAction(invoiceStateTypes.LOADING, false)), 2000)
+      return () => clearInterval(loadingTimeOut)
+      
     });
   }
 }
