@@ -10,9 +10,11 @@ import { InvoiceData } from '../../redux/interfaces/invoice'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppState } from '../../redux/store'
 import { getInvoices } from '../../redux/effect/invoice'
+import { Loading } from '../../components/Loading'
 
 const Home = () => {
-  const [invoiceData, setInvoiceData] = useState({ invoices: [] })
+  const [invoiceData, setInvoiceData] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
   const [singleDetail, setSingleDetail] = useState<InvoiceData>()
   const [showNewInvoice, setShowNewInvoice] = useState(false)
@@ -23,14 +25,22 @@ const Home = () => {
     dispatch(getInvoices())
   }, [dispatch])
 
-  const invoices = useSelector((state: AppState) => state.invoices)
+  const { invoices, loading } = useSelector((state: AppState) => state.invoices)
 
   const handleShowDetails = (invoice: InvoiceData) => {
     setShowDetails(true)
     setSingleDetail(invoice)
   }
 
-  useEffect(() => setInvoiceData(invoices), [invoices])
+  useEffect(() => {
+    setInvoiceData(invoices)
+    setIsLoading(loading)
+  }, [invoices, loading])
+
+  const handleGoBack = () => {
+    setShowNewInvoice(false)
+    dispatch(getInvoices())
+  }
 
   return (
     <>
@@ -40,7 +50,7 @@ const Home = () => {
           goBack={() => setShowDetails(false)}
         />
       ) : showNewInvoice ? (
-        <NewInvoice goBack={() => setShowNewInvoice(false)} />
+        <NewInvoice goBack={handleGoBack} />
       ) : (
         <div className='bg-light-purple px-5 py-8'>
           <div className='flex justify-between items-center mb-8'>
@@ -49,7 +59,7 @@ const Home = () => {
                 Invoices
               </h1>
               <p className='text-dark-grey tracking-tight text-xs font-medium'>
-                {invoiceData?.invoices?.length} invoices
+                {invoiceData?.length} invoices
               </p>
             </div>
             <div className='flex'>
@@ -77,10 +87,12 @@ const Home = () => {
             </div>
           </div>
           <>
-            {invoiceData?.invoices.length === 0 ? (
+            {isLoading ? (
+              <Loading />
+            ) : invoiceData?.length === 0 ? (
               <EmptyState />
             ) : (
-              invoiceData?.invoices?.map((invoice: InvoiceData) => {
+              invoiceData?.map((invoice: InvoiceData) => {
                 return (
                   <div
                     className='w-full h-36 rounded-lg bg-white mt-4 p-4 py-6 cursor-pointer'

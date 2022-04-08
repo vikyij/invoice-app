@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { formatAmount } from '../../utils/index.js'
 import deleteIcon from '../../assets/images/icon-delete.svg'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { InvoiceData } from '../../redux/interfaces/invoice'
-import { addNewInvoice,getInvoices } from '../../redux/effect/invoice'
+import { addNewInvoice } from '../../redux/effect/invoice'
+import { AppState } from '../../redux/store'
+import { InlineLoader } from '../Loading'
 
 interface NewInvoiceProps {
   goBack: () => void
@@ -30,12 +32,20 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
       total: 0,
     },
   ])
+  const [isLoading, setIsLoading] = useState(false)
 
   const dispatch = useDispatch()
+  const { loading } = useSelector((state: AppState) => state.invoices)
+
+  useEffect(() => {
+    setIsLoading(loading)
+  }, [loading])
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<InvoiceData>()
 
   const onSubmit: SubmitHandler<InvoiceData> = (data) => {
@@ -48,9 +58,23 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
     data.items = itemList
     data.total = total
     data.paymentDue = dueDate
-    data.status='pending'
+    data.status = 'pending'
     dispatch(addNewInvoice(data))
-    dispatch(getInvoices())
+
+    const clearInputs = setTimeout(() => {
+      reset()
+      setItemList([
+        {
+          id: uuidv4(),
+          name: '',
+          quantity: '',
+          price: '',
+          total: 0,
+        },
+      ])
+      window.alert('Invoice Created Successfully')
+    }, 3000)
+    return () => clearTimeout(clearInputs)
   }
 
   const addNewItem = () => {
@@ -454,7 +478,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             type='submit'
             className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[138px] h-12'
           >
-            Save Changes
+            {isLoading ? <InlineLoader /> : 'Save Changes'}
           </button>
         </footer>
       </form>
