@@ -131,66 +131,107 @@
       "total": 102.04
     },
     {
+      "id": "RV5913",
+      "status": "pending",
+      "description": "living the baby girl life",
       "senderAddress": {
         "street": "c28 MM2 Ikeja, Lagos",
         "city": "c28 MM2 Ikeja",
         "postCode": "100212",
         "country": "Nigeria"
       },
-      "clientName": "Victoria",
-      "clientEmail": "victoria.i.udechukwu@gmail.com",
+      "createdAt": "2022-04-10",
+      "paymentDue": "2022-04-24T00:00:00.000Z",
+      "clientName": "vikkky",
       "clientAddress": {
-        "street": "banana island",
-        "city": "lagos",
-        "postCode": ""
+        "street": "banana",
+        "city": "Lagos",
+        "postCode": "100212",
+        "country": "Nigeria"
       },
-      "createdAt": "2022-04-07",
-      "paymentTerms": "14",
-      "description": "living the baby girl life",
+      "clientEmail": "victoria.i.udechukwu@gmail.com",
       "items": [
         {
-          "id": "f0f5d265-b419-45e6-8d2d-438a95fcc784",
+          "id": "8794e4d3-5371-44eb-82e9-b9ede5b8fbe1",
           "name": "bags",
-          "quantity": "5",
+          "quantity": "3",
           "price": "2000000",
-          "total": 10000000
+          "total": 6000000
         }
       ],
-      "total": 10000000,
-      "paymentDue": "2022-04-21T00:00:00.000Z",
-      "status": "pending",
-      "id": "Q56uzIt"
+      "total": 6000000,
+      "paymentTerms": "14"
     },
     {
+      "id": "IK1746",
+      "status": "draft",
+      "description": "",
       "senderAddress": {
         "street": "c28 MM2 Ikeja, Lagos",
         "city": "c28 MM2 Ikeja",
         "postCode": "100212",
         "country": "Nigeria"
       },
-      "clientName": "vikkky",
-      "clientEmail": "victoria.i.udechukwu@gmail.com",
+      "createdAt": "2022-04-09",
+      "paymentDue": "2022-05-09T00:00:00.000Z",
+      "clientName": "Brenda",
       "clientAddress": {
-        "street": "c28 MM2 Ikeja, Lagos",
-        "city": "c28 MM2 Ikeja",
-        "postCode": "100212"
+        "street": "silicon valley",
+        "city": "california",
+        "postCode": "",
+        "country": ""
       },
-      "createdAt": "2022-04-01",
-      "paymentTerms": "14",
-      "description": "living the baby girl life",
+      "clientEmail": "victoria.i.udechukwu@gmail.com",
       "items": [
         {
-          "id": "eddeb9dd-acce-4406-8328-37fa6080fa34",
-          "name": "bags",
-          "quantity": "2",
-          "price": "100000",
-          "total": 200000
+          "id": "4517edcc-4a0a-4954-88d4-254cf4e57515",
+          "name": "",
+          "quantity": "",
+          "price": "",
+          "total": 0
         }
       ],
-      "total": 200000,
-      "paymentDue": "2022-04-15T00:00:00.000Z",
+      "total": 0,
+      "paymentTerms": "30"
+    },
+    {
+      "id": "SA1471",
       "status": "pending",
-      "id": "XcU-d_O"
+      "description": "omo",
+      "senderAddress": {
+        "street": "c28 MM2 Ikeja, Lagos",
+        "city": "c28 MM2 Ikeja",
+        "postCode": "100212",
+        "country": "Nigeria"
+      },
+      "createdAt": "2022-04-10",
+      "paymentDue": "2022-04-11T00:00:00.000Z",
+      "clientName": "Victoria",
+      "clientAddress": {
+        "street": "silicon valley",
+        "city": "california",
+        "postCode": "118",
+        "country": "USA"
+      },
+      "clientEmail": "victoria.i.udechukwu@gmail.com",
+      "items": [
+        {
+          "id": "0066d098-2191-43e6-8343-56161ee1fdd8",
+          "name": "shoes",
+          "quantity": "2",
+          "price": "300000",
+          "total": 600000
+        },
+        {
+          "id": "c2d9de85-3e0c-4458-9d75-31eaad76d396",
+          "name": "wigs",
+          "quantity": "2",
+          "price": "10000000",
+          "total": 20000000
+        }
+      ],
+      "total": 20600000,
+      "paymentTerms": "1"
     }
   ]
 }

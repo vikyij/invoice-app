@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { useForm, SubmitHandler } from 'react-hook-form'
 import { formatAmount } from '../../utils/index.js'
 import deleteIcon from '../../assets/images/icon-delete.svg'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
 import { useDispatch, useSelector } from 'react-redux'
-import { InvoiceData } from '../../redux/interfaces/invoice'
 import { addNewInvoice } from '../../redux/effect/invoice'
 import { AppState } from '../../redux/store'
 import { InlineLoader } from '../Loading'
+import { InputValidation } from '../../utils/validationSchema'
 
 interface NewInvoiceProps {
   goBack: () => void
@@ -22,7 +21,36 @@ interface Items {
   total: number
 }
 
+interface Inputs {
+  senderStreet: string
+  senderCity: string
+  senderCountry: string
+  senderPostCode: string
+  clientName: string
+  clientEmail: string
+  clientStreet: string
+  clientCity: string
+  clientCountry: string
+  clientPostCode: string
+  createdAt: Date
+  description: string
+}
+
 const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
+  let initialInputState = {
+    senderStreet: '',
+    senderCity: '',
+    senderCountry: '',
+    senderPostCode: '',
+    clientName: '',
+    clientEmail: '',
+    clientStreet: '',
+    clientCity: '',
+    clientCountry: '',
+    clientPostCode: '',
+    createdAt: new Date(),
+    description: '',
+  }
   const [itemList, setItemList] = useState<Items[]>([
     {
       id: uuidv4(),
@@ -33,6 +61,11 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
     },
   ])
   const [isLoading, setIsLoading] = useState(false)
+  const [inputs, setInputs] = useState<Inputs>(initialInputState)
+  const [paymentTerms, setPaymentTerms] = useState('30')
+  const [errors, setErrors] = useState<Inputs>(initialInputState)
+  const [itemErrors, setItemErrors] = useState(false)
+  const [submitType, setSubmitType] = useState('')
 
   const dispatch = useDispatch()
   const { loading } = useSelector((state: AppState) => state.invoices)
@@ -40,42 +73,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
   useEffect(() => {
     setIsLoading(loading)
   }, [loading])
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<InvoiceData>()
-
-  const onSubmit: SubmitHandler<InvoiceData> = (data) => {
-    let total = itemList.reduce((total, item) => total + item.total, 0)
-
-    let invoiceDate = new Date(data.createdAt)
-    let length = parseInt(data.paymentTerms)
-    let dueDate = new Date(invoiceDate.setDate(invoiceDate.getDate() + length))
-
-    data.items = itemList
-    data.total = total
-    data.paymentDue = dueDate
-    data.status = 'pending'
-    dispatch(addNewInvoice(data))
-
-    const clearInputs = setTimeout(() => {
-      reset()
-      setItemList([
-        {
-          id: uuidv4(),
-          name: '',
-          quantity: '',
-          price: '',
-          total: 0,
-        },
-      ])
-      window.alert('Invoice Created Successfully')
-    }, 3000)
-    return () => clearTimeout(clearInputs)
-  }
 
   const addNewItem = () => {
     setItemList((prev) => [
@@ -97,6 +94,101 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
     }
   }
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+    setInputs((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setPaymentTerms(event.target.value)
+  }
+
+  const handleSubmit = (status: string) => {
+    let total = itemList.reduce((total, item) => total + item.total, 0)
+
+    let invoiceDate = new Date(inputs.createdAt)
+    let length = parseInt(paymentTerms)
+    let dueDate = new Date(invoiceDate.setDate(invoiceDate.getDate() + length))
+
+    const invoicePayload = {
+      id: generateId(),
+      status: status,
+      description: inputs.description,
+      senderAddress: {
+        street: inputs.senderStreet,
+        city: inputs.senderCity,
+        postCode: inputs.senderPostCode,
+        country: inputs.senderCountry,
+      },
+      createdAt: inputs.createdAt,
+      paymentDue: dueDate,
+      clientName: inputs.clientName,
+      clientAddress: {
+        street: inputs.clientStreet,
+        city: inputs.clientCity,
+        postCode: inputs.clientPostCode,
+        country: inputs.clientCountry,
+      },
+      clientEmail: inputs.clientEmail,
+      items: itemList,
+      total: total,
+      paymentTerms: paymentTerms,
+    }
+
+    dispatch(addNewInvoice(invoicePayload))
+
+    const clearInputs = setTimeout(() => {
+      setInputs(initialInputState)
+      setErrors(initialInputState)
+      setItemList([
+        {
+          id: uuidv4(),
+          name: '',
+          quantity: '',
+          price: '',
+          total: 0,
+        },
+      ])
+      setItemErrors(false)
+      window.alert('Invoice Created Successfully')
+    }, 3000)
+    return () => clearTimeout(clearInputs)
+  }
+
+  const handleSend = () => {
+    let isItemListEmpty = itemList.some(
+      (item) => item.name === '' || item.quantity === '' || item.price === ''
+    )
+    InputValidation.validate(inputs, { abortEarly: false })
+      .then(() => {
+        if (isItemListEmpty) {
+          setItemErrors(true)
+        } else {
+          handleSubmit('pending')
+        }
+      })
+      .catch((err) => {
+        let errList: Inputs = initialInputState
+        err.inner.forEach((e: { path: any; message: any }) => {
+          errList = { ...errList, [e.path]: e.message }
+        })
+        setErrors(errList)
+      })
+  }
+
+  const generateId = () => {
+    let randomNum = ''
+    let alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+    for (let i = 0; i < 2; i++) {
+      randomNum = randomNum + alphabetArray[Math.floor(Math.random() * 26)]
+    }
+    for (let i = 0; i < 4; i++) {
+      randomNum = randomNum + Math.floor(Math.random() * 10)
+    }
+    return randomNum
+  }
+
   return (
     <div>
       <div className='flex px-5 pt-8'>
@@ -116,7 +208,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
       <h1 className='font-bold text-2xl text-semi-black my-8 px-5'>
         New Invoice
       </h1>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <div>
         <section className='px-5'>
           <p className='font-bold text-xs text-[#7C5DFA]'>Bill From</p>
           <div className='mt-4 mb-2'>
@@ -129,16 +221,15 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='address'
-              {...register('senderAddress.street', {
-                required: 'Enter your address',
-              })}
+              name='senderStreet'
+              value={inputs.senderStreet}
+              onChange={handleChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.senderAddress?.street && (
-              <span className='mt-5  text-xs text-[red]'>
-                {errors.senderAddress.street.message}
-              </span>
-            )}
+
+            <span className='mt-5  text-xs text-[red]'>
+              {errors?.senderStreet}
+            </span>
           </div>
           <div className='mt-5 mb-2 flex justify-between'>
             <div className='flex flex-col'>
@@ -150,17 +241,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
               </label>
               <input
                 type='text'
-                {...register('senderAddress.city', {
-                  required: 'Enter your city',
-                })}
                 id='city'
+                name='senderCity'
+                value={inputs.senderCity}
+                onChange={handleChange}
                 className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
               />
-              {errors?.senderAddress?.city && (
-                <span className='mt-5  text-xs text-[red]'>
-                  {errors.senderAddress.city.message}
-                </span>
-              )}
+
+              <span className='mt-5  text-xs text-[red]'>
+                {errors?.senderCity}
+              </span>
             </div>
 
             <div className='flex flex-col'>
@@ -171,11 +261,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                 Post Code
               </label>
               <input
-                type='text'
+                type='number'
                 id='post-code'
-                {...register('senderAddress.postCode')}
+                name='senderPostCode'
+                value={inputs.senderPostCode}
+                onChange={handleChange}
                 className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
               />
+              <span className='mt-5  text-xs text-[red]'>
+                {errors?.senderPostCode}
+              </span>
             </div>
           </div>
           <div className='mt-4 mb-2'>
@@ -188,16 +283,15 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='country'
-              {...register('senderAddress.country', {
-                required: 'Enter your country',
-              })}
+              name='senderCountry'
+              value={inputs.senderCountry}
+              onChange={handleChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.senderAddress?.country && (
-              <span className='mt-5  text-xs text-[red]'>
-                {errors.senderAddress.country.message}
-              </span>
-            )}
+
+            <span className='mt-5  text-xs text-[red]'>
+              {errors?.senderCountry}
+            </span>
           </div>
         </section>
 
@@ -213,14 +307,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='client-name'
-              {...register('clientName', { required: "Enter Client's Name" })}
+              name='clientName'
+              value={inputs.clientName}
+              onChange={handleChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.clientName && (
-              <span className='mt-5  text-xs text-[red]'>
-                {errors.clientName.message}
-              </span>
-            )}
+            <span className='mt-5  text-xs text-[red]'>
+              {errors?.clientName}
+            </span>
           </div>
           <div className='mt-4 mb-2'>
             <label
@@ -232,20 +326,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='email'
               id='client-email'
-              {...register('clientEmail', {
-                required: "Enter Client's email",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                  message: 'Enter a valid e-mail address',
-                },
-              })}
+              name='clientEmail'
+              value={inputs.clientEmail}
+              onChange={handleChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.clientEmail && (
-              <span className='mt-5  text-xs text-[red]'>
-                {errors.clientEmail.message}
-              </span>
-            )}
+            <span className='mt-5  text-xs text-[red]'>
+              {errors?.clientEmail}
+            </span>
           </div>
 
           <div className='mt-4 mb-2'>
@@ -258,16 +346,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='client-address'
-              {...register('clientAddress.street', {
-                required: "Enter Client's address",
-              })}
+              name='clientStreet'
+              value={inputs.clientStreet}
+              onChange={handleChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.clientAddress?.street && (
-              <span className='mt-5  text-xs text-[red]'>
-                {errors.clientAddress.street.message}
-              </span>
-            )}
+            <span className='mt-5  text-xs text-[red]'>
+              {errors?.clientStreet}
+            </span>
           </div>
           <div className='mt-5 mb-2 flex justify-between'>
             <div className='flex flex-col'>
@@ -280,16 +366,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
               <input
                 type='text'
                 id='client-city'
-                {...register('clientAddress.city', {
-                  required: "Enter Client's city",
-                })}
+                name='clientCity'
+                value={inputs.clientCity}
+                onChange={handleChange}
                 className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
               />
-              {errors.clientAddress?.city && (
-                <span className='mt-5  text-xs text-[red]'>
-                  {errors.clientAddress.city.message}
-                </span>
-              )}
+              <span className='mt-5  text-xs text-[red]'>
+                {errors?.clientCity}
+              </span>
             </div>
 
             <div className='flex flex-col'>
@@ -300,12 +384,37 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                 Post Code
               </label>
               <input
-                type='text'
+                type='number'
                 id='client-post-code'
-                {...register('clientAddress.postCode')}
+                name='clientPostCode'
+                value={inputs.clientPostCode}
+                onChange={handleChange}
                 className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
               />
+
+              <span className='mt-5  text-xs text-[red]'>
+                {errors?.clientPostCode}
+              </span>
             </div>
+          </div>
+          <div className='mt-4 mb-2'>
+            <label
+              htmlFor='client-country'
+              className='font-normal text-xs text-grey-purple'
+            >
+              Country
+            </label>
+            <input
+              type='text'
+              id='client-country'
+              name='clientCountry'
+              value={inputs.clientCountry}
+              onChange={handleChange}
+              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+            />
+            <span className='mt-5  text-xs text-[red]'>
+              {errors?.clientCountry}
+            </span>
           </div>
           <div className='mt-4 mb-2'>
             <label
@@ -317,14 +426,10 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='date'
               id='invoice-date'
-              {...register('createdAt', { required: 'Enter Invoice Date' })}
+              name='createdAt'
+              onChange={handleChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
-            {errors.createdAt && (
-              <span className='mt-5  text-xs text-[red]'>
-                {errors.createdAt.message}
-              </span>
-            )}
           </div>
           <div className='mt-4 mb-2'>
             <label
@@ -335,8 +440,9 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             </label>
             <select
               id='payment-terms'
-              defaultValue='30'
-              {...register('paymentTerms', { required: true })}
+              name='paymentTerms'
+              value={paymentTerms}
+              onChange={handleSelectChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 font-bold text-xs'
             >
               <option value='1'>Net 1 Day</option>
@@ -355,17 +461,15 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
             <input
               type='text'
               id='project-description'
-              {...register('description', {
-                required: 'Enter project description',
-              })}
+              name='description'
+              value={inputs.description}
+              onChange={handleChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
 
-            {errors.description && (
-              <span className='mt-5  text-xs text-[red]'>
-                {errors.description.message}
-              </span>
-            )}
+            <span className='mt-5  text-xs text-[red]'>
+              {errors?.description}
+            </span>
           </div>
         </section>
 
@@ -393,6 +497,9 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                     className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
                     required
                   />
+                  <span className='mt-5  text-xs text-[red]'>
+                    {itemErrors ? item.name === '' && 'Enter Item name' : ''}
+                  </span>
                 </div>
                 <div className='mt-5 mb-2 flex justify-between'>
                   <div className='flex flex-col'>
@@ -403,7 +510,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                       Qty.
                     </label>
                     <input
-                      type='text'
+                      type='number'
                       id='quantity'
                       name='quantity'
                       value={item.quantity}
@@ -415,6 +522,11 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                       className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-16 mt-2 p-4'
                       required
                     />
+                    <span className='mt-5  text-xs text-[red]'>
+                      {itemErrors
+                        ? item.quantity === '' && 'Enter quantity'
+                        : ''}
+                    </span>
                   </div>
 
                   <div className='flex flex-col'>
@@ -425,7 +537,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                       Price
                     </label>
                     <input
-                      type='text'
+                      type='number'
                       id='price'
                       name='price'
                       value={item.price}
@@ -437,6 +549,9 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                       className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[100px] mt-2 p-4'
                       required
                     />
+                    <span className='mt-5  text-xs text-[red]'>
+                      {itemErrors ? item.price === '' && 'Enter price' : ''}
+                    </span>
                   </div>
 
                   <div className='flex flex-col'>
@@ -470,18 +585,29 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
           </button>
         </div>
         <footer className='flex justify-end items-center bg-[#F9FAFE] p-6 h-28 mt-10'>
-          <button className='font-bold text-xs text-grey-purple bg-[#F9FAFE] rounded-3xl w-24 h-12 mr-2'>
-            Cancel
+          <button className='font-bold text-xs text-grey-purple bg-light-purple rounded-3xl w-24 h-12 mr-2'>
+            Discard
           </button>
 
           <button
             type='submit'
+            onClick={() => {handleSubmit('draft')
+             setSubmitType('draft')}}
+            className='font-bold text-xs text-dark-grey bg-dark-blue rounded-3xl w-[138px] h-12 mr-2'
+          >
+            {submitType === 'draft' && isLoading ? <InlineLoader /> : 'Save as Draft'}
+          </button>
+
+          <button
+            type='submit'
+            onClick={()=>{handleSend()
+              setSubmitType('pending')}}
             className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[138px] h-12'
           >
-            {isLoading ? <InlineLoader /> : 'Save Changes'}
+            {submitType === 'pending' && isLoading ? <InlineLoader /> : 'Save & Send'}
           </button>
         </footer>
-      </form>
+      </div>
     </div>
   )
 }
