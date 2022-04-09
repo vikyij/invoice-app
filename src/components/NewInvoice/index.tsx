@@ -134,7 +134,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
       total: total,
       paymentTerms: paymentTerms,
     }
-    console.log(invoicePayload)
 
     dispatch(addNewInvoice(invoicePayload))
 
