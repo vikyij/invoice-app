@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { formatAmount } from '../../utils/index.js'
 import deleteIcon from '../../assets/images/icon-delete.svg'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
 import { useDispatch, useSelector } from 'react-redux'
-import { addNewInvoice } from '../../redux/effect/invoice'
+import { addNewInvoice, editInvoice } from '../../redux/effect/invoice'
 import { AppState } from '../../redux/store'
 import { InlineLoader } from '../Loading'
 import { InputValidation } from '../../utils/validationSchema'
+import { InvoiceData } from '../../redux/interfaces/invoice'
 
 interface NewInvoiceProps {
+  type: string
+  details?: InvoiceData
   goBack: () => void
 }
 
@@ -32,11 +35,11 @@ interface Inputs {
   clientCity: string
   clientCountry: string
   clientPostCode: string
-  createdAt: Date
+  createdAt: string
   description: string
 }
 
-const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
+const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
   let initialInputState = {
     senderStreet: '',
     senderCity: '',
@@ -48,7 +51,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
     clientCity: '',
     clientCountry: '',
     clientPostCode: '',
-    createdAt: new Date(),
+    createdAt: '',
     description: '',
   }
   const [itemList, setItemList] = useState<Items[]>([
@@ -66,6 +69,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
   const [errors, setErrors] = useState<Inputs>(initialInputState)
   const [itemErrors, setItemErrors] = useState(false)
   const [submitType, setSubmitType] = useState('')
+  const [saved, setSaved] = useState(false)
 
   const dispatch = useDispatch()
   const { loading } = useSelector((state: AppState) => state.invoices)
@@ -73,6 +77,40 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
   useEffect(() => {
     setIsLoading(loading)
   }, [loading])
+
+  const initialDetails = useCallback(() => {
+    if (details) {
+      setInputs({
+        senderStreet: details?.senderAddress?.street,
+        senderCity: details?.senderAddress?.city,
+        senderCountry: details?.senderAddress?.country,
+        senderPostCode: details?.senderAddress?.postCode,
+        clientName: details?.clientName,
+        clientEmail: details?.clientEmail,
+        clientStreet: details?.clientAddress?.street,
+        clientCity: details?.clientAddress?.city,
+        clientCountry: details?.clientAddress?.country,
+        clientPostCode: details?.clientAddress?.postCode,
+        createdAt: details?.createdAt,
+        description: details?.description,
+      })
+
+      setPaymentTerms(details?.paymentTerms)
+      let items = details?.items.map((item) => item)
+
+      setItemList(items)
+    }
+  }, [details])
+
+  useEffect(() => {
+    initialDetails()
+  }, [initialDetails])
+
+  const handleReset = () => {
+    if (!saved) {
+      initialDetails()
+    }
+  }
 
   const addNewItem = () => {
     setItemList((prev) => [
@@ -111,7 +149,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
     let dueDate = new Date(invoiceDate.setDate(invoiceDate.getDate() + length))
 
     const invoicePayload = {
-      id: generateId(),
+      id: type === 'new' ? generateId() : details?.id,
       status: status,
       description: inputs.description,
       senderAddress: {
@@ -135,24 +173,36 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
       paymentTerms: paymentTerms,
     }
 
-    dispatch(addNewInvoice(invoicePayload))
+    if (type === 'edit') {
+      dispatch(editInvoice(invoicePayload))
+    } else {
+      dispatch(addNewInvoice(invoicePayload))
+    }
 
-    const clearInputs = setTimeout(() => {
-      setInputs(initialInputState)
-      setErrors(initialInputState)
-      setItemList([
-        {
-          id: uuidv4(),
-          name: '',
-          quantity: '',
-          price: '',
-          total: 0,
-        },
-      ])
-      setItemErrors(false)
-      window.alert('Invoice Created Successfully')
-    }, 3000)
-    return () => clearTimeout(clearInputs)
+    if (type === 'new') {
+      const clearInputs = setTimeout(() => {
+        setInputs(initialInputState)
+        setErrors(initialInputState)
+        setItemList([
+          {
+            id: uuidv4(),
+            name: '',
+            quantity: '',
+            price: '',
+            total: 0,
+          },
+        ])
+        setItemErrors(false)
+        window.alert('Invoice Created Successfully')
+      }, 3000)
+      return () => clearTimeout(clearInputs)
+    } else {
+      const showAlert = setTimeout(() => {
+        window.alert('Edited Successfully')
+        setSaved(true)
+      }, 3000)
+      return () => clearTimeout(showAlert)
+    }
   }
 
   const handleSend = () => {
@@ -206,7 +256,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
         </p>
       </div>
       <h1 className='font-bold text-2xl text-semi-black my-8 px-5'>
-        New Invoice
+        {type === 'edit' ? `Edit #${details?.id}` : 'New Invoice'}
       </h1>
       <div>
         <section className='px-5'>
@@ -261,7 +311,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                 Post Code
               </label>
               <input
-                type='number'
+                type='text'
                 id='post-code'
                 name='senderPostCode'
                 value={inputs.senderPostCode}
@@ -384,7 +434,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
                 Post Code
               </label>
               <input
-                type='number'
+                type='text'
                 id='client-post-code'
                 name='clientPostCode'
                 value={inputs.clientPostCode}
@@ -427,6 +477,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
               type='date'
               id='invoice-date'
               name='createdAt'
+              value={inputs.createdAt}
               onChange={handleChange}
               className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
             />
@@ -585,27 +636,70 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack }) => {
           </button>
         </div>
         <footer className='flex justify-end items-center bg-[#F9FAFE] p-6 h-28 mt-10'>
-          <button className='font-bold text-xs text-grey-purple bg-light-purple rounded-3xl w-24 h-12 mr-2'>
-            Discard
-          </button>
+          {type === 'edit' ? (
+            <>
+              <button
+                onClick={handleReset}
+                className='font-bold text-xs text-grey-purple bg-light-purple rounded-3xl w-24 h-12 mr-2'
+              >
+                Cancel
+              </button>
 
-          <button
-            type='submit'
-            onClick={() => {handleSubmit('draft')
-             setSubmitType('draft')}}
-            className='font-bold text-xs text-dark-grey bg-dark-blue rounded-3xl w-[138px] h-12 mr-2'
-          >
-            {submitType === 'draft' && isLoading ? <InlineLoader /> : 'Save as Draft'}
-          </button>
+              <button
+                type='submit'
+                onClick={() => {
+                  handleSend()
+                  setSubmitType('pending')
+                }}
+                className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[138px] h-12'
+              >
+                {submitType === 'pending' && isLoading ? (
+                  <InlineLoader />
+                ) : (
+                  'Save Changes'
+                )}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={goBack}
+                className='font-bold text-xs text-grey-purple bg-light-purple rounded-3xl w-24 h-12 mr-2'
+              >
+                Discard
+              </button>
 
-          <button
-            type='submit'
-            onClick={()=>{handleSend()
-              setSubmitType('pending')}}
-            className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[138px] h-12'
-          >
-            {submitType === 'pending' && isLoading ? <InlineLoader /> : 'Save & Send'}
-          </button>
+              <button
+                type='submit'
+                onClick={() => {
+                  handleSubmit('draft')
+                  setSubmitType('draft')
+                }}
+                className='font-bold text-xs text-dark-grey bg-dark-blue rounded-3xl w-[138px] h-12 mr-2'
+              >
+                {submitType === 'draft' && isLoading ? (
+                  <InlineLoader />
+                ) : (
+                  'Save as Draft'
+                )}
+              </button>
+
+              <button
+                type='submit'
+                onClick={() => {
+                  handleSend()
+                  setSubmitType('pending')
+                }}
+                className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[138px] h-12'
+              >
+                {submitType === 'pending' && isLoading ? (
+                  <InlineLoader />
+                ) : (
+                  'Save & Send'
+                )}
+              </button>
+            </>
+          )}
         </footer>
       </div>
     </div>

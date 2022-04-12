@@ -32,3 +32,19 @@ export const addNewInvoice = (data: InvoiceData) => {
     });
   }
 }
+
+export const editInvoice = (data: InvoiceData) => {
+  return function(dispatch: Dispatch<InvoiceActionTypes>) {
+    dispatch(getInvoiceAction(invoiceStateTypes.LOADING, true))
+
+    fetch(`http://localhost:3000/invoices/${data.id}`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    }).then(res => res.json())
+      .then(data => {        
+        const loadingTimeOut = setTimeout(() => dispatch(getInvoiceAction(invoiceStateTypes.LOADING, false)), 2000)
+        return () => clearInterval(loadingTimeOut)
+      })
+  }
+}

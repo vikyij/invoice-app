@@ -101,10 +101,10 @@
     },
     {
       "id": "RT2080",
-      "createdAt": "2021-10-11",
-      "paymentDue": "2021-10-12",
-      "description": "Logo Concept",
-      "paymentTerms": 1,
+      "createdAt": "2022-04-13",
+      "paymentDue": "2022-04-20T00:00:00.000Z",
+      "description": "enjoy",
+      "paymentTerms": "7",
       "clientName": "Alysa Werner",
       "clientEmail": "alysa@email.co.uk",
       "status": "pending",
@@ -122,116 +122,78 @@
       },
       "items": [
         {
-          "name": "Logo Sketches",
-          "quantity": 1,
-          "price": 102.04,
-          "total": 102.04
+          "id": "30014d92-acbc-458a-82f5-31af6f966898",
+          "name": "wigs",
+          "quantity": "2",
+          "price": "200000",
+          "total": 400000
         }
       ],
-      "total": 102.04
+      "total": 400000
     },
     {
       "id": "RV5913",
       "status": "pending",
-      "description": "living the baby girl life",
+      "description": "living expenses",
       "senderAddress": {
-        "street": "c28 MM2 Ikeja, Lagos",
-        "city": "c28 MM2 Ikeja",
+        "street": "Cambridge",
+        "city": "london",
         "postCode": "100212",
-        "country": "Nigeria"
+        "country": "UK"
       },
-      "createdAt": "2022-04-10",
-      "paymentDue": "2022-04-24T00:00:00.000Z",
-      "clientName": "vikkky",
+      "createdAt": "2022-04-12",
+      "paymentDue": "2022-05-12T00:00:00.000Z",
+      "clientName": "promise",
       "clientAddress": {
-        "street": "banana",
+        "street": "Banana Island",
         "city": "Lagos",
         "postCode": "100212",
         "country": "Nigeria"
       },
-      "clientEmail": "victoria.i.udechukwu@gmail.com",
+      "clientEmail": "udechukwu@gmail.com",
       "items": [
         {
           "id": "8794e4d3-5371-44eb-82e9-b9ede5b8fbe1",
-          "name": "bags",
-          "quantity": "3",
-          "price": "2000000",
-          "total": 6000000
+          "name": "school books",
+          "quantity": "5",
+          "price": "20000",
+          "total": 100000
         }
       ],
-      "total": 6000000,
-      "paymentTerms": "14"
-    },
-    {
-      "id": "IK1746",
-      "status": "draft",
-      "description": "",
-      "senderAddress": {
-        "street": "c28 MM2 Ikeja, Lagos",
-        "city": "c28 MM2 Ikeja",
-        "postCode": "100212",
-        "country": "Nigeria"
-      },
-      "createdAt": "2022-04-09",
-      "paymentDue": "2022-05-09T00:00:00.000Z",
-      "clientName": "Brenda",
-      "clientAddress": {
-        "street": "silicon valley",
-        "city": "california",
-        "postCode": "",
-        "country": ""
-      },
-      "clientEmail": "victoria.i.udechukwu@gmail.com",
-      "items": [
-        {
-          "id": "4517edcc-4a0a-4954-88d4-254cf4e57515",
-          "name": "",
-          "quantity": "",
-          "price": "",
-          "total": 0
-        }
-      ],
-      "total": 0,
+      "total": 100000,
       "paymentTerms": "30"
     },
     {
-      "id": "SA1471",
+      "id": "IK1746",
       "status": "pending",
-      "description": "omo",
+      "description": "living the baby boy life",
       "senderAddress": {
         "street": "c28 MM2 Ikeja, Lagos",
         "city": "c28 MM2 Ikeja",
         "postCode": "100212",
         "country": "Nigeria"
       },
-      "createdAt": "2022-04-10",
-      "paymentDue": "2022-04-11T00:00:00.000Z",
-      "clientName": "Victoria",
+      "createdAt": "2022-04-12",
+      "paymentDue": "2022-04-26T00:00:00.000Z",
+      "clientName": "Nonso",
       "clientAddress": {
-        "street": "silicon valley",
-        "city": "california",
-        "postCode": "118",
+        "street": "California",
+        "city": "Cambridge",
+        "postCode": "200212",
         "country": "USA"
       },
-      "clientEmail": "victoria.i.udechukwu@gmail.com",
+      "clientEmail": "nonso@gmail.com",
       "items": [
         {
-          "id": "0066d098-2191-43e6-8343-56161ee1fdd8",
+          "id": "4517edcc-4a0a-4954-88d4-254cf4e57515",
           "name": "shoes",
           "quantity": "2",
-          "price": "300000",
-          "total": 600000
-        },
-        {
-          "id": "c2d9de85-3e0c-4458-9d75-31eaad76d396",
-          "name": "wigs",
-          "quantity": "2",
-          "price": "10000000",
-          "total": 20000000
+          "price": "20000",
+          "total": 40000
         }
       ],
-      "total": 20600000,
-      "paymentTerms": "1"
+      "total": 40000,
+      "paymentTerms": "14"
     }
   ]
 }

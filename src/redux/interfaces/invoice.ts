@@ -1,6 +1,6 @@
 export interface InvoiceData {
   status: string
-  id: string
+  id?: string
   description: string
   senderAddress: {
     street: string
@@ -8,7 +8,7 @@ export interface InvoiceData {
     postCode: string
     country: string
   }
-  createdAt: Date
+  createdAt: string
   paymentDue: Date
   clientName: string
   clientAddress: {

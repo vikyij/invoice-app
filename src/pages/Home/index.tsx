@@ -47,10 +47,13 @@ const Home = () => {
       {showDetails ? (
         <InvoiceDetails
           details={singleDetail}
-          goBack={() => setShowDetails(false)}
+          goBack={() => {
+            setShowDetails(false)
+            dispatch(getInvoices())
+          }}
         />
       ) : showNewInvoice ? (
-        <NewInvoice goBack={handleGoBack} />
+        <NewInvoice goBack={handleGoBack} type='new' />
       ) : (
         <div className='bg-light-purple px-5 py-8'>
           <div className='flex justify-between items-center mb-8'>
