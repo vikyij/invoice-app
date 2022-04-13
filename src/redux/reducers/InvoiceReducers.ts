@@ -24,6 +24,11 @@ export const getInvoiceReducer = (
        ...state,
        loading: action.loadingPayload
     }
+    case invoiceStateTypes.SINGLE_INVOICE:
+      return{
+        ...state,
+        singleInvoice: action.singleInvoicePayload
+      }
     default:
       return state;
   }

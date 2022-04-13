@@ -8,7 +8,7 @@
       "paymentTerms": 1,
       "clientName": "Jensen Huang",
       "clientEmail": "jensenh@mail.com",
-      "status": "paid",
+      "status": "draft",
       "senderAddress": {
         "street": "19 Union Terrace",
         "city": "London",
@@ -76,7 +76,7 @@
       "paymentTerms": 7,
       "clientName": "John Morrison",
       "clientEmail": "jm@myco.com",
-      "status": "paid",
+      "status": "draft",
       "senderAddress": {
         "street": "19 Union Terrace",
         "city": "London",
@@ -123,17 +123,17 @@
       "items": [
         {
           "id": "30014d92-acbc-458a-82f5-31af6f966898",
-          "name": "wigs",
+          "name": "Iphone12",
           "quantity": "2",
-          "price": "200000",
-          "total": 400000
+          "price": "300000",
+          "total": 600000
         }
       ],
-      "total": 400000
+      "total": 600000
     },
     {
       "id": "RV5913",
-      "status": "pending",
+      "status": "paid",
       "description": "living expenses",
       "senderAddress": {
         "street": "Cambridge",
@@ -168,21 +168,21 @@
       "status": "pending",
       "description": "living the baby boy life",
       "senderAddress": {
-        "street": "c28 MM2 Ikeja, Lagos",
-        "city": "c28 MM2 Ikeja",
+        "street": "Opebi",
+        "city": "Lagos",
         "postCode": "100212",
         "country": "Nigeria"
       },
       "createdAt": "2022-04-12",
       "paymentDue": "2022-04-26T00:00:00.000Z",
-      "clientName": "Nonso",
+      "clientName": "Nonso Udechukwu",
       "clientAddress": {
         "street": "California",
         "city": "Cambridge",
         "postCode": "200212",
         "country": "USA"
       },
-      "clientEmail": "nonso@gmail.com",
+      "clientEmail": "theudechukwu@gmail.com",
       "items": [
         {
           "id": "4517edcc-4a0a-4954-88d4-254cf4e57515",
@@ -190,9 +190,48 @@
           "quantity": "2",
           "price": "20000",
           "total": 40000
+        },
+        {
+          "id": "0c6c08af-c7b7-4f1c-9a9c-ab8b09c4c910",
+          "name": "Iphone13",
+          "quantity": "1",
+          "price": "500000",
+          "total": 500000
         }
       ],
-      "total": 40000,
+      "total": 540000,
+      "paymentTerms": "14"
+    },
+    {
+      "id": "RM3085",
+      "status": "paid",
+      "description": "living the baby girl life",
+      "senderAddress": {
+        "street": "c28 MM2 Ikeja, Lagos",
+        "city": "c28 MM2 Ikeja",
+        "postCode": "100212",
+        "country": "Nigeria"
+      },
+      "createdAt": "2022-04-07",
+      "paymentDue": "2022-04-21T00:00:00.000Z",
+      "clientName": "vikkky",
+      "clientAddress": {
+        "street": "c28 MM2 Ikeja, Lagos",
+        "city": "c28 MM2 Ikeja",
+        "postCode": "100212",
+        "country": "Nigeria"
+      },
+      "clientEmail": "victoria.i.udechukwu@gmail.com",
+      "items": [
+        {
+          "id": "d81a9359-2f7e-4b20-a955-47400e539ec2",
+          "name": "bags",
+          "quantity": "6",
+          "price": "7890",
+          "total": 47340
+        }
+      ],
+      "total": 47340,
       "paymentTerms": "14"
     }
   ]

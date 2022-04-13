@@ -42,8 +42,11 @@ export const editInvoice = (data: InvoiceData) => {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data)
     }).then(res => res.json())
-      .then(data => {        
-        const loadingTimeOut = setTimeout(() => dispatch(getInvoiceAction(invoiceStateTypes.LOADING, false)), 2000)
+      .then(data => {              
+        const loadingTimeOut = setTimeout(() => {
+          dispatch(getInvoiceAction(invoiceStateTypes.LOADING, false))
+          dispatch(getInvoiceAction(invoiceStateTypes.SINGLE_INVOICE,false,[], data))  
+        }, 2000)
         return () => clearInterval(loadingTimeOut)
       })
   }
