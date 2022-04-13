@@ -13,7 +13,7 @@ import { InvoiceData } from '../../redux/interfaces/invoice'
 interface NewInvoiceProps {
   type: string
   details?: InvoiceData
-  goBack: () => void
+  goBack: (newDetails?: InvoiceData) => void
 }
 
 interface Items {
@@ -72,7 +72,9 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
   const [saved, setSaved] = useState(false)
 
   const dispatch = useDispatch()
-  const { loading } = useSelector((state: AppState) => state.invoices)
+  const { loading, singleInvoice } = useSelector(
+    (state: AppState) => state.invoices
+  )
 
   useEffect(() => {
     setIsLoading(loading)
@@ -246,11 +248,15 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
           src={leftArrow}
           alt='back arrow icon'
           className='cursor-pointer'
-          onClick={goBack}
+          onClick={() => {
+            type === 'new' ? goBack() : goBack(singleInvoice)
+          }}
         />
         <p
           className='font-bold text-xs text-semi-black ml-6 cursor-pointer'
-          onClick={goBack}
+          onClick={() => {
+            type === 'new' ? goBack() : goBack(singleInvoice)
+          }}
         >
           Go Back
         </p>
@@ -663,7 +669,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
           ) : (
             <>
               <button
-                onClick={goBack}
+                onClick={() => goBack()}
                 className='font-bold text-xs text-grey-purple bg-light-purple rounded-3xl w-24 h-12 mr-2'
               >
                 Discard

@@ -12,11 +12,45 @@ import { AppState } from '../../redux/store'
 import { getInvoices } from '../../redux/effect/invoice'
 import { Loading } from '../../components/Loading'
 
+const initialSingleDetail = {
+  id: '',
+  status: '',
+  description: '',
+  senderAddress: {
+    street: '',
+    city: '',
+    postCode: '',
+    country: '',
+  },
+  createdAt: '',
+  paymentDue: new Date(),
+  clientName: '',
+  clientAddress: {
+    street: '',
+    city: '',
+    postCode: '',
+    country: '',
+  },
+  clientEmail: '',
+  items: [
+    {
+      id: '',
+      name: '',
+      quantity: '',
+      price: '',
+      total: 0,
+    },
+  ],
+  total: 0,
+  paymentTerms: '',
+}
+
 const Home = () => {
   const [invoiceData, setInvoiceData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
-  const [singleDetail, setSingleDetail] = useState<InvoiceData>()
+  const [singleDetail, setSingleDetail] =
+    useState<InvoiceData>(initialSingleDetail)
   const [showNewInvoice, setShowNewInvoice] = useState(false)
 
   const dispatch = useDispatch()
