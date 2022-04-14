@@ -6,7 +6,7 @@ import { formatDate, formatAmount } from '../../utils/index.js'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
 import { InvoiceData } from '../../redux/interfaces/invoice'
 import NewInvoice from '../NewInvoice'
-import { editInvoice } from '../../redux/effect/invoice'
+import { editInvoice, deleteInvoiceApi } from '../../redux/effect/invoice'
 import { AppState } from '../../redux/store'
 import { InlineLoader } from '../Loading'
 
@@ -20,6 +20,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
   const [showEdit, setShowEdit] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [invoiceDetails, setInvoiceDetails] = useState(details)
+  const [markAsPaid, setMarkAsPaid] = useState(false)
 
   const dispatch = useDispatch()
   const { loading, singleInvoice } = useSelector(
@@ -37,6 +38,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
   }, [singleInvoice])
 
   const handlePaid = () => {
+    setMarkAsPaid(true)
     const invoicePayload = {
       id: details?.id,
       status: 'paid',
@@ -66,6 +68,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
 
     const showAlert = setTimeout(() => {
       window.alert('Successful')
+      setMarkAsPaid(false)
     }, 3000)
 
     return () => clearTimeout(showAlert)
@@ -75,6 +78,19 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
     setShowEdit(false)
     if (newDetails) {
       setInvoiceDetails(newDetails)
+    }
+  }
+
+  const handleDelete = (id?: string) => {
+    if (id) {
+      dispatch(deleteInvoiceApi(id))
+      const showAlert = setTimeout(() => {
+        window.alert('Invoice deleted Successful')
+        setDeleteInvoice(false)
+        goBack()
+      }, 3000)
+
+      return () => clearTimeout(showAlert)
     }
   }
 
@@ -208,7 +224,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
                 onClick={handlePaid}
                 className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[149px] h-12'
               >
-                {isLoading ? <InlineLoader /> : 'Mark as Paid'}
+                {markAsPaid && isLoading ? <InlineLoader /> : 'Mark as Paid'}
               </button>
             </footer>
           )}
@@ -233,8 +249,11 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
               >
                 Cancel
               </button>
-              <button className='font-bold text-xs text-white bg-[#EC5757] rounded-3xl w-[89px] h-12'>
-                Delete
+              <button
+                onClick={() => handleDelete(invoiceDetails?.id)}
+                className='font-bold text-xs text-white bg-[#EC5757] rounded-3xl w-[89px] h-12'
+              >
+                {deleteInvoice && isLoading ? <InlineLoader /> : 'Delete'}
               </button>
             </div>
           </div>

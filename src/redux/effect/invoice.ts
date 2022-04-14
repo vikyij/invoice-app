@@ -51,3 +51,21 @@ export const editInvoice = (data: InvoiceData) => {
       })
   }
 }
+
+export const deleteInvoiceApi = (id?:string) => {
+  return function(dispatch: Dispatch<InvoiceActionTypes>) {
+    dispatch(getInvoiceAction(invoiceStateTypes.LOADING, true))
+
+    fetch(`http://localhost:3000/invoices/${id}`, {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+    }).then(res => res.json())
+      .then(data => {                      
+        const loadingTimeOut = setTimeout(() => {
+          dispatch(getInvoiceAction(invoiceStateTypes.LOADING, false))
+        }, 2000)
+        return () => clearInterval(loadingTimeOut)
+      })
+  }
+}
+
