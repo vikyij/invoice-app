@@ -100,39 +100,7 @@
       "total": 14002.33
     },
     {
-      "id": "RT2080",
-      "createdAt": "2022-04-13",
-      "paymentDue": "2022-04-20T00:00:00.000Z",
-      "description": "enjoy",
-      "paymentTerms": "7",
-      "clientName": "Alysa Werner",
-      "clientEmail": "alysa@email.co.uk",
-      "status": "pending",
-      "senderAddress": {
-        "street": "19 Union Terrace",
-        "city": "London",
-        "postCode": "E1 3EZ",
-        "country": "United Kingdom"
-      },
-      "clientAddress": {
-        "street": "63 Warwick Road",
-        "city": "Carlisle",
-        "postCode": "CA20 2TG",
-        "country": "United Kingdom"
-      },
-      "items": [
-        {
-          "id": "30014d92-acbc-458a-82f5-31af6f966898",
-          "name": "Iphone12",
-          "quantity": "2",
-          "price": "300000",
-          "total": 600000
-        }
-      ],
-      "total": 600000
-    },
-    {
-      "id": "RV5913",
+      "id": "RV5914",
       "status": "paid",
       "description": "living expenses",
       "senderAddress": {
@@ -164,46 +132,7 @@
       "paymentTerms": "30"
     },
     {
-      "id": "IK1746",
-      "status": "pending",
-      "description": "living the baby boy life",
-      "senderAddress": {
-        "street": "Opebi",
-        "city": "Lagos",
-        "postCode": "100212",
-        "country": "Nigeria"
-      },
-      "createdAt": "2022-04-12",
-      "paymentDue": "2022-04-26T00:00:00.000Z",
-      "clientName": "Nonso Udechukwu",
-      "clientAddress": {
-        "street": "California",
-        "city": "Cambridge",
-        "postCode": "200212",
-        "country": "USA"
-      },
-      "clientEmail": "theudechukwu@gmail.com",
-      "items": [
-        {
-          "id": "4517edcc-4a0a-4954-88d4-254cf4e57515",
-          "name": "shoes",
-          "quantity": "2",
-          "price": "20000",
-          "total": 40000
-        },
-        {
-          "id": "0c6c08af-c7b7-4f1c-9a9c-ab8b09c4c910",
-          "name": "Iphone13",
-          "quantity": "1",
-          "price": "500000",
-          "total": 500000
-        }
-      ],
-      "total": 540000,
-      "paymentTerms": "14"
-    },
-    {
-      "id": "RM3085",
+      "id": "RM3087",
       "status": "paid",
       "description": "living the baby girl life",
       "senderAddress": {
