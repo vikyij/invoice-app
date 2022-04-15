@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useReducer } from 'react'
+import classNames from 'classnames'
 import downArrow from '../../assets/images/icon-arrow-down.svg'
 import plusIcon from '../../assets/images/icon-plus.svg'
+import checkIcon from '../../assets/images/icon-check.svg'
 import EmptyState from '../../components/EmptyState'
 import Status from '../../components/Status'
 import InvoiceDetails from '../../components/InvoiceDetails'
@@ -45,6 +47,44 @@ const initialSingleDetail = {
   paymentTerms: '',
 }
 
+enum filterActionType {
+  draft = 'DRAFT',
+  pending = 'PENDING',
+  paid = 'PAID',
+}
+
+interface filterAction {
+  type: filterActionType
+}
+
+interface filterState {
+  draft: boolean
+  pending: boolean
+  paid: boolean
+}
+
+const initialFilterState = {
+  draft: false,
+  pending: false,
+  paid: false,
+}
+
+const filterReducer = (state: filterState, action: filterAction) => {
+  switch (action.type) {
+    case 'DRAFT':
+      return { ...state, draft: !state.draft }
+
+    case 'PENDING':
+      return { ...state, pending: !state.pending }
+
+    case 'PAID':
+      return { ...state, paid: !state.paid }
+
+    default:
+      return state
+  }
+}
+
 const Home = () => {
   const [invoiceData, setInvoiceData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -52,6 +92,13 @@ const Home = () => {
   const [singleDetail, setSingleDetail] =
     useState<InvoiceData>(initialSingleDetail)
   const [showNewInvoice, setShowNewInvoice] = useState(false)
+  const [showFilter, setShowfilter] = useState(false)
+  const [filteredData, setFilteredData] = useState([])
+
+  const [filterState, filterDispatch] = useReducer(
+    filterReducer,
+    initialFilterState
+  )
 
   const dispatch = useDispatch()
 
@@ -76,6 +123,21 @@ const Home = () => {
     dispatch(getInvoices())
   }
 
+  useEffect(() => {
+    const filteredState = Object.entries(filterState)
+      .filter(([key, value]) => value === true)
+      .map((value) => value[0])
+
+    const filteredInvoiceData = invoiceData?.filter((invoice: InvoiceData) =>
+      filteredState.includes(invoice.status)
+    )
+
+    setFilteredData(filteredInvoiceData)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterState])
+
+  const displayData = filteredData.length !== 0 ? filteredData : invoiceData
+
   return (
     <>
       {showDetails ? (
@@ -99,14 +161,103 @@ const Home = () => {
                 {invoiceData?.length} invoices
               </p>
             </div>
-            <div className='flex'>
-              <div className='mr-4 flex items-center'>
-                <p className='font-bold text-sm text-semi-black mr-2'>Filter</p>
-                <img
-                  src={downArrow}
-                  className='w-2 h-2'
-                  alt='filter-dropdown-icon'
-                />
+            <div className='flex items-center'>
+              <div className='mr-4 flex flex-col items-center'>
+                <div className='flex items-center'>
+                  <p className='font-bold text-sm text-semi-black mr-2'>
+                    Filter
+                  </p>
+                  <img
+                    src={downArrow}
+                    className='w-2 h-2'
+                    alt='filter-dropdown-icon'
+                    onClick={() => setShowfilter(!showFilter)}
+                  />
+                </div>
+
+                <div
+                  className={classNames(
+                    'w-28 bg-white rounded-lg shadow-3xl absolute mt-10 transition-transform p-4 pt-5',
+                    {
+                      hidden: !showFilter,
+                      block: showFilter,
+                      'h-32': showFilter,
+                    }
+                  )}
+                >
+                  <div
+                    className='flex mb-4'
+                    onClick={() => {
+                      filterDispatch({ type: filterActionType.draft })
+                    }}
+                  >
+                    <div
+                      className={classNames('rounded-sm w-4 h-4 mr-3', {
+                        'bg-[#DFE3FA]': !filterState.draft,
+                        'bg-purple': filterState.draft,
+                      })}
+                      data-id='draft'
+                    >
+                      <img
+                        src={checkIcon}
+                        className={classNames('my-[0px] mx-[auto] pt-[3px]', {
+                          hidden: !filterState.draft,
+                          block: filterState.draft,
+                        })}
+                        alt='checked icon'
+                      />
+                    </div>
+                    <p className='text-xs font-bold text-semi-black'>Draft</p>
+                  </div>
+                  <div
+                    className='flex mb-4'
+                    onClick={() => {
+                      filterDispatch({ type: filterActionType.pending })
+                    }}
+                  >
+                    <div
+                      className={classNames('rounded-sm w-4 h-4 mr-3', {
+                        'bg-[#DFE3FA]': !filterState.pending,
+                        'bg-purple': filterState.pending,
+                      })}
+                      data-id='pending'
+                    >
+                      <img
+                        src={checkIcon}
+                        className={classNames('my-[0px] mx-[auto] pt-[3px]', {
+                          hidden: !filterState.pending,
+                          block: filterState.pending,
+                        })}
+                        alt='checked icon'
+                      />
+                    </div>
+                    <p className='text-xs font-bold text-semi-black'>Pending</p>
+                  </div>
+                  <div
+                    className='flex'
+                    onClick={() => {
+                      filterDispatch({ type: filterActionType.paid })
+                    }}
+                  >
+                    <div
+                      className={classNames('rounded-sm w-4 h-4 mr-3', {
+                        'bg-[#DFE3FA]': !filterState.paid,
+                        'bg-purple': filterState.paid,
+                      })}
+                      data-id='paid'
+                    >
+                      <img
+                        src={checkIcon}
+                        className={classNames('my-[0px] mx-[auto] pt-[3px]', {
+                          hidden: !filterState.paid,
+                          block: filterState.paid,
+                        })}
+                        alt='checked icon'
+                      />
+                    </div>
+                    <p className='text-xs font-bold text-semi-black'>Paid</p>
+                  </div>
+                </div>
               </div>
               <div
                 className='w-[90px] h-10 rounded-3xl bg-purple flex items-center cursor-pointer'
@@ -129,7 +280,7 @@ const Home = () => {
             ) : invoiceData?.length === 0 ? (
               <EmptyState />
             ) : (
-              invoiceData?.map((invoice: InvoiceData) => {
+              displayData?.map((invoice: InvoiceData) => {
                 return (
                   <div
                     className='w-full h-36 rounded-lg bg-white mt-4 p-4 py-6 cursor-pointer'
