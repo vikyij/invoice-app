@@ -3,10 +3,10 @@ import Home from './pages/Home'
 
 const App = () => {
   return (
-    <>
+    <div className='bg-light-purple h-screen'>
       <Header />
       <Home />
-    </>
+    </div>
   )
 }
 

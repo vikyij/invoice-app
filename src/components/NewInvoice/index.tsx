@@ -242,7 +242,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
   }
 
   return (
-    <div>
+    <div className='bg-white'>
       <div className='flex px-5 pt-8'>
         <img
           src={leftArrow}

@@ -1,7 +1,11 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      boxShadow: {
+        '3xl': '0px 10px 20px rgba(72, 84, 159, 0.25)',
+      },
+    },
     colors: {
       'dark-blue': '#373B53',
       purple: '#7C5DFA',
