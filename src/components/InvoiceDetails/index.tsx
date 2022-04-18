@@ -9,13 +9,19 @@ import NewInvoice from '../NewInvoice'
 import { editInvoice, deleteInvoiceApi } from '../../redux/effect/invoice'
 import { AppState } from '../../redux/store'
 import { InlineLoader } from '../Loading'
+import classNames from 'classnames'
 
 interface InvoiceDetailsProps {
   details: InvoiceData
   goBack: () => void
+  mode: string
 }
 
-const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
+const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
+  details,
+  goBack,
+  mode,
+}) => {
   const [deleteInvoice, setDeleteInvoice] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -97,10 +103,20 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
   return (
     <>
       {showEdit ? (
-        <NewInvoice goBack={handleGoBack} type='edit' details={details} />
+        <NewInvoice
+          goBack={handleGoBack}
+          type='edit'
+          details={details}
+          mode={mode}
+        />
       ) : (
         <>
-          <div className='bg-light-purple px-5 py-8'>
+          <div
+            className={classNames('px-5 py-8', {
+              'bg-light-purple': mode === 'light',
+              'bg-black': mode === 'dark',
+            })}
+          >
             <div className='flex'>
               <img
                 src={leftArrow}
@@ -109,27 +125,65 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
                 onClick={goBack}
               />
               <p
-                className='font-bold text-xs text-semi-black ml-6 cursor-pointer'
+                className={classNames('font-bold text-xs ml-6 cursor-pointer', {
+                  'text-semi-black': mode === 'light',
+                  'text-white': mode === 'dark',
+                })}
                 onClick={goBack}
               >
                 Go Back
               </p>
             </div>
-            <div className='w-full h-24 rounded-lg bg-white mt-10 mb-4 p-6 flex justify-between items-center'>
+            <div
+              className={classNames(
+                'w-full h-24 rounded-lg mt-10 mb-4 p-6 flex justify-between items-center',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                }
+              )}
+            >
               <p className='text-xs font-medium text-[#858BB2]'>Status</p>
-              <Status status={invoiceDetails?.status} />
+              <Status status={invoiceDetails?.status} mode={mode} />
             </div>
 
-            <div className='w-full rounded-lg bg-white p-6 mb-10'>
-              <p className='font-bold text-xs text-semi-black'>
-                <span className='text-dark-grey'>#</span>
+            <div
+              className={classNames('w-full rounded-lg p-6 mb-10', {
+                'bg-white': mode === 'light',
+                'bg-dark-purple': mode === 'dark',
+              })}
+            >
+              <p
+                className={classNames('font-bold text-xs', {
+                  'text-semi-black': mode === 'light',
+                  'text-white': mode === 'dark',
+                })}
+              >
+                <span
+                  className={classNames({
+                    'text-dark-grey': mode === 'light',
+                    'text-grey-purple': mode === 'dark',
+                  })}
+                >
+                  #
+                </span>
                 {invoiceDetails?.id}
               </p>
-              <p className='font-medium text-xs text-grey-purple'>
+              <p
+                className={classNames('font-medium text-xs ', {
+                  'text-grey-purple': mode === 'light',
+                  'text-light-grey': mode === 'dark',
+                })}
+              >
                 {invoiceDetails?.description}
               </p>
 
-              <section className='font-medium text-xs text-grey-purple my-10'>
+              <section
+                className={classNames('font-medium text-xs my-10', {
+                  'text-grey-purple': mode === 'light',
+                  'text-light-grey': mode === 'dark',
+                })}
+              >
                 <p>{invoiceDetails?.senderAddress.street}</p>
                 <p>{invoiceDetails?.senderAddress.city}</p>
                 <p>{invoiceDetails?.senderAddress.postCode}</p>
@@ -138,28 +192,63 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
 
               <div className='flex justify-between'>
                 <section>
-                  <p className='font-medium text-xs text-grey-purple'>
+                  <p
+                    className={classNames('font-medium text-xs', {
+                      'text-grey-purple': mode === 'light',
+                      'text-light-grey': mode === 'dark',
+                    })}
+                  >
                     Invoice Date
                   </p>
-                  <p className='font-bold text-sm text-semi-black'>
+                  <p
+                    className={classNames('font-bold text-sm', {
+                      'text-semi-black': mode === 'light',
+                      'text-white': mode === 'dark',
+                    })}
+                  >
                     {formatDate(invoiceDetails?.createdAt)}
                   </p>
 
-                  <p className='font-medium text-xs text-grey-purple mt-8'>
+                  <p
+                    className={classNames('font-medium text-xs mt-8', {
+                      'text-grey-purple': mode === 'light',
+                      'text-light-grey': mode === 'dark',
+                    })}
+                  >
                     Payment Due
                   </p>
-                  <p className='font-bold text-sm text-semi-black'>
+                  <p
+                    className={classNames('font-bold text-sm', {
+                      'text-semi-black': mode === 'light',
+                      'text-white': mode === 'dark',
+                    })}
+                  >
                     {formatDate(invoiceDetails?.paymentDue)}
                   </p>
                 </section>
                 <section>
-                  <p className='font-medium text-xs text-grey-purple'>
+                  <p
+                    className={classNames('font-medium text-xs', {
+                      'text-grey-purple': mode === 'light',
+                      'text-light-grey': mode === 'dark',
+                    })}
+                  >
                     Bill To
                   </p>
-                  <p className='font-bold text-sm text-semi-black'>
+                  <p
+                    className={classNames('font-bold text-sm', {
+                      'text-semi-black': mode === 'light',
+                      'text-white': mode === 'dark',
+                    })}
+                  >
                     {invoiceDetails?.clientName}
                   </p>
-                  <section className='font-medium text-xs text-grey-purple'>
+                  <section
+                    className={classNames('font-medium text-xs', {
+                      'text-grey-purple': mode === 'light',
+                      'text-light-grey': mode === 'dark',
+                    })}
+                  >
                     <p>{invoiceDetails?.clientAddress.street}</p>
                     <p>{invoiceDetails?.clientAddress.city}</p>
                     <p>{invoiceDetails?.clientAddress.postCode}</p>
@@ -167,14 +256,32 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
                   </section>
                 </section>
               </div>
-              <p className='font-medium text-xs text-grey-purple mt-8'>
+              <p
+                className={classNames('font-medium text-xs mt-8', {
+                  'text-grey-purple': mode === 'light',
+                  'text-light-grey': mode === 'dark',
+                })}
+              >
                 Sent to
               </p>
-              <p className='font-bold text-sm text-semi-black'>
+              <p
+                className={classNames('font-bold text-sm', {
+                  'text-semi-black': mode === 'light',
+                  'text-white': mode === 'dark',
+                })}
+              >
                 {invoiceDetails?.clientEmail}
               </p>
 
-              <section className='w-72 bg-[#F9FAFE] rounded-tr-lg rounded-tl-lg px-6 mt-10 pb-6'>
+              <section
+                className={classNames(
+                  'w-72 rounded-tr-lg rounded-tl-lg px-6 mt-10 pb-6',
+                  {
+                    'bg-[#F9FAFE]': mode === 'light',
+                    'bg-[#252945]': mode === 'dark',
+                  }
+                )}
+              >
                 {invoiceDetails?.items.map((item) => {
                   return (
                     <div
@@ -182,14 +289,30 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
                       key={item.id}
                     >
                       <div>
-                        <p className='font-bold text-xs text-semi-black'>
+                        <p
+                          className={classNames('font-bold text-xs', {
+                            'text-semi-black': mode === 'light',
+                            'text-white': mode === 'dark',
+                          })}
+                        >
                           {item.name}
                         </p>
-                        <p className='font-bold text-xs text-grey-purple mt-2'>{`${
-                          item.quantity
-                        } x ${formatAmount(item.price)}`}</p>
+                        <p
+                          className={classNames(
+                            'font-bold text-xs text-grey-purple mt-2',
+                            {
+                              'text-grey-purple': mode === 'light',
+                              'text-dark-grey': mode === 'dark',
+                            }
+                          )}
+                        >{`${item.quantity} x ${formatAmount(item.price)}`}</p>
                       </div>
-                      <p className='font-bold text-xs text-semi-black'>
+                      <p
+                        className={classNames('font-bold text-xs', {
+                          'text-semi-black': mode === 'light',
+                          'text-white': mode === 'dark',
+                        })}
+                      >
                         {formatAmount(item.total)}
                       </p>
                     </div>
@@ -197,7 +320,15 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
                 })}
               </section>
 
-              <div className='w-72 h-20 bg-dark-blue rounded-bl-lg rounded-br-lg p-6 flex justify-between items-center'>
+              <div
+                className={classNames(
+                  'w-72 h-20 rounded-bl-lg rounded-br-lg p-6 flex justify-between items-center',
+                  {
+                    'bg-dark-blue': mode === 'light',
+                    'bg-black': mode === 'dark',
+                  }
+                )}
+              >
                 <p className='font-medium text-xs text-white'>Grand Total</p>
                 <p className='font-bold text-xl text-white'>
                   {formatAmount(invoiceDetails?.total)}
@@ -207,10 +338,21 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
           </div>
 
           {invoiceDetails?.status !== 'paid' && (
-            <footer className='flex justify-between items-center bg-white p-6'>
+            <footer
+              className={classNames('flex justify-between items-center p-6', {
+                'bg-white': mode === 'light',
+                'bg-dark-purple': mode === 'dark',
+              })}
+            >
               <button
                 onClick={() => setShowEdit(true)}
-                className='font-bold text-xs text-grey-purple bg-[#F9FAFE] rounded-3xl w-[73px] h-12'
+                className={classNames(
+                  'font-bold text-xs text-grey-purple  rounded-3xl w-[73px] h-12',
+                  {
+                    'bg-[#F9FAFE]': mode === 'light',
+                    'bg-[#252945]': mode === 'dark',
+                  }
+                )}
               >
                 Edit
               </button>
@@ -237,14 +379,32 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ details, goBack }) => {
           width='327px'
           height='220px'
         >
-          <div className='bg-white p-6 rounded-md'>
-            <p className='font-bold text-xl text-semi-black'>
+          <div
+            className={classNames('p-6 rounded-md', {
+              'bg-white': mode === 'light',
+              'bg-dark-purple': mode === 'dark',
+            })}
+          >
+            <p
+              className={classNames('font-bold text-xl ', {
+                'text-semi-black': mode === 'light',
+                'text-white': mode === 'dark',
+              })}
+            >
               Confirm Deletion
             </p>
             <p className='font-normal text-xs text-dark-grey mt-3'>{`Are you sure you want to delete invoice #${invoiceDetails?.id}? This action cannot be undone.`}</p>
             <div className='mt-6 flex justify-end'>
               <button
-                className='font-bold text-xs text-grey-purple bg-[#F9FAFE] rounded-3xl w-[91px] h-12 mr-2'
+                className={classNames(
+                  'font-bold text-xs  rounded-3xl w-[91px] h-12 mr-2',
+                  {
+                    'bg-[#F9FAFE]': mode === 'light',
+                    'bg-[#252945]': mode === 'dark',
+                    'text-grey-purple': mode === 'light',
+                    'text-[#DFE3FA]': mode === 'dark',
+                  }
+                )}
                 onClick={() => setDeleteInvoice(false)}
               >
                 Cancel
