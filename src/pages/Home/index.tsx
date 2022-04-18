@@ -85,7 +85,11 @@ const filterReducer = (state: filterState, action: filterAction) => {
   }
 }
 
-const Home = () => {
+interface HomeProps {
+  mode: string
+}
+
+const Home: React.FC<HomeProps> = ({ mode }) => {
   const [invoiceData, setInvoiceData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
@@ -147,14 +151,25 @@ const Home = () => {
             setShowDetails(false)
             dispatch(getInvoices())
           }}
+          mode={mode}
         />
       ) : showNewInvoice ? (
-        <NewInvoice goBack={handleGoBack} type='new' />
+        <NewInvoice goBack={handleGoBack} type='new' mode={mode} />
       ) : (
-        <div className='bg-light-purple px-5 py-8'>
+        <div
+          className={classNames('px-5 py-8', {
+            'bg-light-purple': mode === 'light',
+            'bg-black': mode === 'dark',
+          })}
+        >
           <div className='flex justify-between items-center mb-8'>
             <div>
-              <h1 className='font-bold text-2xl tracking-tighter text-semi-black'>
+              <h1
+                className={classNames('font-bold text-2xl tracking-tighter', {
+                  'text-semi-black': mode === 'light',
+                  'text-white': mode === 'dark',
+                })}
+              >
                 Invoices
               </h1>
               <p className='text-dark-grey tracking-tight text-xs font-medium'>
@@ -164,7 +179,12 @@ const Home = () => {
             <div className='flex items-center'>
               <div className='mr-4 flex flex-col items-center'>
                 <div className='flex items-center'>
-                  <p className='font-bold text-sm text-semi-black mr-2'>
+                  <p
+                    className={classNames('font-bold text-sm mr-2', {
+                      'text-semi-black': mode === 'light',
+                      'text-white': mode === 'dark',
+                    })}
+                  >
                     Filter
                   </p>
                   <img
@@ -177,11 +197,13 @@ const Home = () => {
 
                 <div
                   className={classNames(
-                    'w-28 bg-white rounded-lg shadow-3xl absolute mt-10 transition-transform p-4 pt-5',
+                    'w-28 rounded-lg shadow-3xl absolute mt-10 transition-transform p-4 pt-5',
                     {
                       hidden: !showFilter,
                       block: showFilter,
                       'h-32': showFilter,
+                      'bg-white': mode === 'light',
+                      'bg-dark-purple': mode === 'dark',
                     }
                   )}
                 >
@@ -207,7 +229,14 @@ const Home = () => {
                         alt='checked icon'
                       />
                     </div>
-                    <p className='text-xs font-bold text-semi-black'>Draft</p>
+                    <p
+                      className={classNames('text-xs font-bold ', {
+                        'text-semi-black': mode === 'light',
+                        'text-white': mode === 'dark',
+                      })}
+                    >
+                      Draft
+                    </p>
                   </div>
                   <div
                     className='flex mb-4'
@@ -231,7 +260,14 @@ const Home = () => {
                         alt='checked icon'
                       />
                     </div>
-                    <p className='text-xs font-bold text-semi-black'>Pending</p>
+                    <p
+                      className={classNames('text-xs font-bold ', {
+                        'text-semi-black': mode === 'light',
+                        'text-white': mode === 'dark',
+                      })}
+                    >
+                      Pending
+                    </p>
                   </div>
                   <div
                     className='flex'
@@ -255,7 +291,14 @@ const Home = () => {
                         alt='checked icon'
                       />
                     </div>
-                    <p className='text-xs font-bold text-semi-black'>Paid</p>
+                    <p
+                      className={classNames('text-xs font-bold ', {
+                        'text-semi-black': mode === 'light',
+                        'text-white': mode === 'dark',
+                      })}
+                    >
+                      Paid
+                    </p>
                   </div>
                 </div>
               </div>
@@ -276,36 +319,69 @@ const Home = () => {
           </div>
           <>
             {isLoading ? (
-              <Loading />
+              <Loading mode={mode} />
             ) : invoiceData?.length === 0 ? (
-              <EmptyState />
+              <EmptyState mode={mode} />
             ) : (
               displayData?.map((invoice: InvoiceData) => {
                 return (
                   <div
-                    className='w-full h-36 rounded-lg bg-white mt-4 p-4 py-6 cursor-pointer'
+                    className={classNames(
+                      'w-full h-36 rounded-lg  mt-4 p-4 py-6 cursor-pointer',
+                      {
+                        'bg-white': mode === 'light',
+                        'bg-dark-purple': mode === 'dark',
+                      }
+                    )}
                     key={invoice.id}
                     onClick={() => handleShowDetails(invoice)}
                   >
                     <div className='flex justify-between'>
-                      <p className='font-bold text-xs text-semi-black'>
-                        <span className='text-dark-grey'>#</span>
+                      <p
+                        className={classNames('font-bold text-xs', {
+                          'text-semi-black': mode === 'light',
+                          'text-white': mode === 'dark',
+                        })}
+                      >
+                        <span
+                          className={classNames({
+                            'text-dark-grey': mode === 'light',
+                            'text-grey-purple': mode === 'dark',
+                          })}
+                        >
+                          #
+                        </span>
                         {invoice.id}
                       </p>
-                      <p className='font-bold text-xs text-dark-grey'>
+                      <p
+                        className={classNames('font-bold text-xs', {
+                          'text-dark-grey': mode === 'light',
+                          'text-white': mode === 'dark',
+                        })}
+                      >
                         {invoice.clientName}
                       </p>
                     </div>
                     <div className='flex justify-between mt-5'>
                       <div>
-                        <p className='font-medium text-xs text-dark-grey'>
+                        <p
+                          className={classNames('font-medium text-xs', {
+                            'text-dark-grey': mode === 'light',
+                            'text-light-grey': mode === 'dark',
+                          })}
+                        >
                           {`Due ${formatDate(invoice.paymentDue)}`}
                         </p>
-                        <h2 className='font-bold text-base text-semi-black'>
+                        <h2
+                          className={classNames('font-bold text-base', {
+                            'text-semi-black': mode === 'light',
+                            'text-white': mode === 'dark',
+                          })}
+                        >
                           {formatAmount(invoice.total)}
                         </h2>
                       </div>
-                      <Status status={invoice.status} />
+                      <Status status={invoice.status} mode={mode} />
                     </div>
                   </div>
                 )

@@ -9,11 +9,13 @@ import { AppState } from '../../redux/store'
 import { InlineLoader } from '../Loading'
 import { InputValidation } from '../../utils/validationSchema'
 import { InvoiceData } from '../../redux/interfaces/invoice'
+import classNames from 'classnames'
 
 interface NewInvoiceProps {
   type: string
   details?: InvoiceData
   goBack: (newDetails?: InvoiceData) => void
+  mode: string
 }
 
 interface Items {
@@ -39,7 +41,12 @@ interface Inputs {
   description: string
 }
 
-const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
+const NewInvoice: React.FC<NewInvoiceProps> = ({
+  goBack,
+  type,
+  details,
+  mode,
+}) => {
   let initialInputState = {
     senderStreet: '',
     senderCity: '',
@@ -242,7 +249,12 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
   }
 
   return (
-    <div className='bg-white'>
+    <div
+      className={classNames({
+        'bg-white': mode === 'light',
+        'bg-black': mode === 'dark',
+      })}
+    >
       <div className='flex px-5 pt-8'>
         <img
           src={leftArrow}
@@ -253,7 +265,10 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
           }}
         />
         <p
-          className='font-bold text-xs text-semi-black ml-6 cursor-pointer'
+          className={classNames('font-bold text-xs ml-6 cursor-pointer', {
+            'text-semi-black': mode === 'light',
+            'text-white': mode === 'dark',
+          })}
           onClick={() => {
             type === 'new' ? goBack() : goBack(singleInvoice)
           }}
@@ -261,7 +276,12 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
           Go Back
         </p>
       </div>
-      <h1 className='font-bold text-2xl text-semi-black my-8 px-5'>
+      <h1
+        className={classNames('font-bold text-2xl my-8 px-5', {
+          'text-semi-black': mode === 'light',
+          'text-white': mode === 'dark',
+        })}
+      >
         {type === 'edit' ? `Edit #${details?.id}` : 'New Invoice'}
       </h1>
       <div>
@@ -280,7 +300,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='senderStreet'
               value={inputs.senderStreet}
               onChange={handleChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+              className={classNames(
+                'rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             />
 
             <span className='mt-5  text-xs text-[red]'>
@@ -301,7 +330,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
                 name='senderCity'
                 value={inputs.senderCity}
                 onChange={handleChange}
-                className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
+                className={classNames(
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs',
+                  {
+                    'bg-white': mode === 'light',
+                    'bg-dark-purple': mode === 'dark',
+                    'border-[1px]': mode === 'light',
+                    'border-0': mode === 'dark',
+                    'text-white': mode === 'dark',
+                  }
+                )}
               />
 
               <span className='mt-5  text-xs text-[red]'>
@@ -322,7 +360,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
                 name='senderPostCode'
                 value={inputs.senderPostCode}
                 onChange={handleChange}
-                className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
+                className={classNames(
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs',
+                  {
+                    'bg-white': mode === 'light',
+                    'bg-dark-purple': mode === 'dark',
+                    'border-[1px]': mode === 'light',
+                    'border-0': mode === 'dark',
+                    'text-white': mode === 'dark',
+                  }
+                )}
               />
               <span className='mt-5  text-xs text-[red]'>
                 {errors?.senderPostCode}
@@ -342,7 +389,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='senderCountry'
               value={inputs.senderCountry}
               onChange={handleChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+              className={classNames(
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             />
 
             <span className='mt-5  text-xs text-[red]'>
@@ -366,7 +422,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='clientName'
               value={inputs.clientName}
               onChange={handleChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+              className={classNames(
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             />
             <span className='mt-5  text-xs text-[red]'>
               {errors?.clientName}
@@ -385,7 +450,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='clientEmail'
               value={inputs.clientEmail}
               onChange={handleChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+              className={classNames(
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             />
             <span className='mt-5  text-xs text-[red]'>
               {errors?.clientEmail}
@@ -405,7 +479,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='clientStreet'
               value={inputs.clientStreet}
               onChange={handleChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+              className={classNames(
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             />
             <span className='mt-5  text-xs text-[red]'>
               {errors?.clientStreet}
@@ -425,7 +508,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
                 name='clientCity'
                 value={inputs.clientCity}
                 onChange={handleChange}
-                className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
+                className={classNames(
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs',
+                  {
+                    'bg-white': mode === 'light',
+                    'bg-dark-purple': mode === 'dark',
+                    'border-[1px]': mode === 'light',
+                    'border-0': mode === 'dark',
+                    'text-white': mode === 'dark',
+                  }
+                )}
               />
               <span className='mt-5  text-xs text-[red]'>
                 {errors?.clientCity}
@@ -445,7 +537,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
                 name='clientPostCode'
                 value={inputs.clientPostCode}
                 onChange={handleChange}
-                className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4'
+                className={classNames(
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs',
+                  {
+                    'bg-white': mode === 'light',
+                    'bg-dark-purple': mode === 'dark',
+                    'border-[1px]': mode === 'light',
+                    'border-0': mode === 'dark',
+                    'text-white': mode === 'dark',
+                  }
+                )}
               />
 
               <span className='mt-5  text-xs text-[red]'>
@@ -466,7 +567,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='clientCountry'
               value={inputs.clientCountry}
               onChange={handleChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+              className={classNames(
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             />
             <span className='mt-5  text-xs text-[red]'>
               {errors?.clientCountry}
@@ -485,7 +595,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='createdAt'
               value={inputs.createdAt}
               onChange={handleChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+              className={classNames(
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             />
           </div>
           <div className='mt-4 mb-2'>
@@ -500,7 +619,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='paymentTerms'
               value={paymentTerms}
               onChange={handleSelectChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 font-bold text-xs'
+              className={classNames(
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 font-bold text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             >
               <option value='1'>Net 1 Day</option>
               <option value='7'>Net 7 Days</option>
@@ -521,7 +649,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
               name='description'
               value={inputs.description}
               onChange={handleChange}
-              className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+              className={classNames(
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                {
+                  'bg-white': mode === 'light',
+                  'bg-dark-purple': mode === 'dark',
+                  'border-[1px]': mode === 'light',
+                  'border-0': mode === 'dark',
+                  'text-white': mode === 'dark',
+                }
+              )}
             />
 
             <span className='mt-5  text-xs text-[red]'>
@@ -551,7 +688,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
                       item.name = event.target.value
                       setItemList([...itemList])
                     }}
-                    className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4'
+                    className={classNames(
+                      'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                      {
+                        'bg-white': mode === 'light',
+                        'bg-dark-purple': mode === 'dark',
+                        'border-[1px]': mode === 'light',
+                        'border-0': mode === 'dark',
+                        'text-white': mode === 'dark',
+                      }
+                    )}
                     required
                   />
                   <span className='mt-5  text-xs text-[red]'>
@@ -576,7 +722,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
                         item.total = +item.quantity * +item.price
                         setItemList([...itemList])
                       }}
-                      className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-16 mt-2 p-4'
+                      className={classNames(
+                        'rounded border-solid border-[#DFE3FA] h-12 w-16 mt-2 p-4 text-xs',
+                        {
+                          'bg-white': mode === 'light',
+                          'bg-dark-purple': mode === 'dark',
+                          'border-[1px]': mode === 'light',
+                          'border-0': mode === 'dark',
+                          'text-white': mode === 'dark',
+                        }
+                      )}
                       required
                     />
                     <span className='mt-5  text-xs text-[red]'>
@@ -603,7 +758,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
                         item.total = +item.quantity * +item.price
                         setItemList([...itemList])
                       }}
-                      className='rounded border-[1px] border-solid border-[#DFE3FA] h-12 w-[100px] mt-2 p-4'
+                      className={classNames(
+                        'rounded border-solid border-[#DFE3FA] h-12 w-[100px] mt-2 p-4 text-xs',
+                        {
+                          'bg-white': mode === 'light',
+                          'bg-dark-purple': mode === 'dark',
+                          'border-[1px]': mode === 'light',
+                          'border-0': mode === 'dark',
+                          'text-white': mode === 'dark',
+                        }
+                      )}
                       required
                     />
                     <span className='mt-5  text-xs text-[red]'>
@@ -635,18 +799,38 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
         <div className='px-5'>
           <button
             type='button'
-            className='w-full h-12 font-bold text-xs text-grey-purple mt-8 bg-[#F9FAFE] rounded-3xl'
+            className={classNames(
+              'w-full h-12 font-bold text-xs text-grey-purple mt-8  rounded-3xl',
+              {
+                'bg-[#F9FAFE]': mode === 'light',
+                'bg-dark-purple': mode === 'dark',
+              }
+            )}
             onClick={addNewItem}
           >
             + Add New Item
           </button>
         </div>
-        <footer className='flex justify-end items-center bg-[#F9FAFE] p-6 h-28 mt-10'>
+        <footer
+          className={classNames(
+            'flex justify-end items-center p-6 h-28 mt-10',
+            {
+              'bg-[#F9FAFE]': mode === 'light',
+              'bg-dark-purple': mode === 'dark',
+            }
+          )}
+        >
           {type === 'edit' ? (
             <>
               <button
                 onClick={handleReset}
-                className='font-bold text-xs text-grey-purple bg-light-purple rounded-3xl w-24 h-12 mr-2'
+                className={classNames(
+                  'font-bold text-xs text-grey-purple  rounded-3xl w-24 h-12 mr-2',
+                  {
+                    'bg-light-purple': mode === 'light',
+                    'bg-[#252945]': mode === 'dark',
+                  }
+                )}
               >
                 Cancel
               </button>
@@ -657,7 +841,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
                   handleSend()
                   setSubmitType('pending')
                 }}
-                className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[138px] h-12'
+                className='font-bold text-xs text-white rounded-3xl w-[138px] h-12 bg-[#7C5DFA]'
               >
                 {submitType === 'pending' && isLoading ? (
                   <InlineLoader />
@@ -670,7 +854,13 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ goBack, type, details }) => {
             <>
               <button
                 onClick={() => goBack()}
-                className='font-bold text-xs text-grey-purple bg-light-purple rounded-3xl w-24 h-12 mr-2'
+                className={classNames(
+                  'font-bold text-xs text-grey-purple rounded-3xl w-24 h-12 mr-2',
+                  {
+                    'bg-light-purple': mode === 'light',
+                    'bg-[#252945]': mode === 'dark',
+                  }
+                )}
               >
                 Discard
               </button>

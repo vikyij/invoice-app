@@ -1,5 +1,6 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       boxShadow: {
@@ -17,6 +18,9 @@ module.exports = {
       white: '#ffffff',
       'light-purple': '#F8F8FB',
       'grey-purple': '#7E88C3',
+      black: '#000000',
+      'dark-purple': '#1E2139',
+      'light-grey': '#DFE3FA',
     },
   },
   plugins: [],
