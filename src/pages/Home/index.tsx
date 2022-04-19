@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppState } from '../../redux/store'
 import { getInvoices } from '../../redux/effect/invoice'
 import { Loading } from '../../components/Loading'
+import rightArrow from '../../assets/images/icon-arrow-right.svg'
 
 const initialSingleDetail = {
   id: '',
@@ -98,6 +99,7 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
   const [showNewInvoice, setShowNewInvoice] = useState(false)
   const [showFilter, setShowfilter] = useState(false)
   const [filteredData, setFilteredData] = useState([])
+  const [width] = useState(window.innerWidth)
 
   const [filterState, filterDispatch] = useReducer(
     filterReducer,
@@ -157,10 +159,13 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
         <NewInvoice goBack={handleGoBack} type='new' mode={mode} />
       ) : (
         <div
-          className={classNames('px-5 py-8', {
-            'bg-light-purple': mode === 'light',
-            'bg-black': mode === 'dark',
-          })}
+          className={classNames(
+            'px-5 py-8 md:w-full md:my-[30px] md:mx-[100px]',
+            {
+              'bg-light-purple': mode === 'light',
+              'bg-black': mode === 'dark',
+            }
+          )}
         >
           <div className='flex justify-between items-center mb-8'>
             <div>
@@ -173,31 +178,35 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                 Invoices
               </h1>
               <p className='text-dark-grey tracking-tight text-xs font-medium'>
-                {invoiceData?.length} invoices
+                {width > 700
+                  ? `There are ${invoiceData?.length} invoices`
+                  : `${invoiceData?.length} invoices`}
               </p>
             </div>
             <div className='flex items-center'>
-              <div className='mr-4 flex flex-col items-center'>
-                <div className='flex items-center'>
+              <div className='mr-4 md:mr-7 flex flex-col items-center'>
+                <div
+                  className='flex items-center cursor-pointer'
+                  onClick={() => setShowfilter(!showFilter)}
+                >
                   <p
                     className={classNames('font-bold text-sm mr-2', {
                       'text-semi-black': mode === 'light',
                       'text-white': mode === 'dark',
                     })}
                   >
-                    Filter
+                    {width > 700 ? `Filter by status` : `Filter`}
                   </p>
                   <img
                     src={downArrow}
                     className='w-2 h-2'
                     alt='filter-dropdown-icon'
-                    onClick={() => setShowfilter(!showFilter)}
                   />
                 </div>
 
                 <div
                   className={classNames(
-                    'w-28 rounded-lg shadow-3xl absolute mt-10 transition-transform p-4 pt-5',
+                    'w-28 md:w-48 rounded-lg shadow-3xl absolute mt-10 transition-transform p-4 pt-5 md:p-5',
                     {
                       hidden: !showFilter,
                       block: showFilter,
@@ -214,10 +223,13 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                     }}
                   >
                     <div
-                      className={classNames('rounded-sm w-4 h-4 mr-3', {
-                        'bg-[#DFE3FA]': !filterState.draft,
-                        'bg-purple': filterState.draft,
-                      })}
+                      className={classNames(
+                        'rounded-sm w-4 h-4 mr-3 cursor-pointer',
+                        {
+                          'bg-[#DFE3FA]': !filterState.draft,
+                          'bg-purple': filterState.draft,
+                        }
+                      )}
                       data-id='draft'
                     >
                       <img
@@ -230,10 +242,13 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                       />
                     </div>
                     <p
-                      className={classNames('text-xs font-bold ', {
-                        'text-semi-black': mode === 'light',
-                        'text-white': mode === 'dark',
-                      })}
+                      className={classNames(
+                        'text-xs font-bold cursor-pointer',
+                        {
+                          'text-semi-black': mode === 'light',
+                          'text-white': mode === 'dark',
+                        }
+                      )}
                     >
                       Draft
                     </p>
@@ -245,10 +260,13 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                     }}
                   >
                     <div
-                      className={classNames('rounded-sm w-4 h-4 mr-3', {
-                        'bg-[#DFE3FA]': !filterState.pending,
-                        'bg-purple': filterState.pending,
-                      })}
+                      className={classNames(
+                        'rounded-sm w-4 h-4 mr-3 cursor-pointer',
+                        {
+                          'bg-[#DFE3FA]': !filterState.pending,
+                          'bg-purple': filterState.pending,
+                        }
+                      )}
                       data-id='pending'
                     >
                       <img
@@ -261,10 +279,13 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                       />
                     </div>
                     <p
-                      className={classNames('text-xs font-bold ', {
-                        'text-semi-black': mode === 'light',
-                        'text-white': mode === 'dark',
-                      })}
+                      className={classNames(
+                        'text-xs font-bold cursor-pointer',
+                        {
+                          'text-semi-black': mode === 'light',
+                          'text-white': mode === 'dark',
+                        }
+                      )}
                     >
                       Pending
                     </p>
@@ -276,10 +297,13 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                     }}
                   >
                     <div
-                      className={classNames('rounded-sm w-4 h-4 mr-3', {
-                        'bg-[#DFE3FA]': !filterState.paid,
-                        'bg-purple': filterState.paid,
-                      })}
+                      className={classNames(
+                        'rounded-sm w-4 h-4 mr-3 cursor-pointer',
+                        {
+                          'bg-[#DFE3FA]': !filterState.paid,
+                          'bg-purple': filterState.paid,
+                        }
+                      )}
                       data-id='paid'
                     >
                       <img
@@ -292,10 +316,13 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                       />
                     </div>
                     <p
-                      className={classNames('text-xs font-bold ', {
-                        'text-semi-black': mode === 'light',
-                        'text-white': mode === 'dark',
-                      })}
+                      className={classNames(
+                        'text-xs font-bold cursor-pointer',
+                        {
+                          'text-semi-black': mode === 'light',
+                          'text-white': mode === 'dark',
+                        }
+                      )}
                     >
                       Paid
                     </p>
@@ -303,7 +330,7 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                 </div>
               </div>
               <div
-                className='w-[90px] h-10 rounded-3xl bg-purple flex items-center cursor-pointer'
+                className='w-[90px] md:w-[150px] h-10 rounded-3xl bg-purple flex items-center cursor-pointer'
                 onClick={() => setShowNewInvoice(true)}
               >
                 <div className='w-8 h-8 bg-white rounded-3xl ml-1.5 mr-1.5'>
@@ -313,7 +340,10 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                     alt='add-new-invoice-icon'
                   />
                 </div>
-                <p className='text-white font-bold text-xs'>New</p>
+                <p className='text-white font-bold text-xs'>
+                  {' '}
+                  {width > 700 ? `New invoice` : `New`}
+                </p>
               </div>
             </div>
           </div>
@@ -327,7 +357,7 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                 return (
                   <div
                     className={classNames(
-                      'w-full h-36 rounded-lg  mt-4 p-4 py-6 cursor-pointer',
+                      'w-full h-36 md:h-[72px] rounded-lg  mt-4 p-4 py-6 md:py-0 md:px-6 cursor-pointer',
                       {
                         'bg-white': mode === 'light',
                         'bg-dark-purple': mode === 'dark',
@@ -336,9 +366,60 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                     key={invoice.id}
                     onClick={() => handleShowDetails(invoice)}
                   >
-                    <div className='flex justify-between'>
+                    <div className='md:hidden'>
+                      <div className='flex justify-between'>
+                        <p
+                          className={classNames('font-bold text-xs', {
+                            'text-semi-black': mode === 'light',
+                            'text-white': mode === 'dark',
+                          })}
+                        >
+                          <span
+                            className={classNames({
+                              'text-dark-grey': mode === 'light',
+                              'text-grey-purple': mode === 'dark',
+                            })}
+                          >
+                            #
+                          </span>
+                          {invoice.id}
+                        </p>
+
+                        <p
+                          className={classNames('font-bold text-xs', {
+                            'text-dark-grey': mode === 'light',
+                            'text-white': mode === 'dark',
+                          })}
+                        >
+                          {invoice.clientName}
+                        </p>
+                      </div>
+                      <div className='flex justify-between mt-5'>
+                        <div>
+                          <p
+                            className={classNames('font-medium text-xs', {
+                              'text-dark-grey': mode === 'light',
+                              'text-light-grey': mode === 'dark',
+                            })}
+                          >
+                            {`Due ${formatDate(invoice.paymentDue)}`}
+                          </p>
+                          <h2
+                            className={classNames('font-bold text-base', {
+                              'text-semi-black': mode === 'light',
+                              'text-white': mode === 'dark',
+                            })}
+                          >
+                            {formatAmount(invoice.total)}
+                          </h2>
+                        </div>
+                        <Status status={invoice.status} mode={mode} />
+                      </div>
+                    </div>
+
+                    <div className='hidden md:flex justify-between md:items-center md:h-full'>
                       <p
-                        className={classNames('font-bold text-xs', {
+                        className={classNames('font-bold text-xs md:w-[10%]', {
                           'text-semi-black': mode === 'light',
                           'text-white': mode === 'dark',
                         })}
@@ -354,34 +435,37 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                         {invoice.id}
                       </p>
                       <p
-                        className={classNames('font-bold text-xs', {
+                        className={classNames('font-medium text-xs md:w-1/5', {
+                          'text-dark-grey': mode === 'light',
+                          'text-light-grey': mode === 'dark',
+                        })}
+                      >
+                        {`Due ${formatDate(invoice.paymentDue)}`}
+                      </p>
+                      <p
+                        className={classNames('font-bold text-xs md:w-1/5', {
                           'text-dark-grey': mode === 'light',
                           'text-white': mode === 'dark',
                         })}
                       >
                         {invoice.clientName}
                       </p>
-                    </div>
-                    <div className='flex justify-between mt-5'>
-                      <div>
-                        <p
-                          className={classNames('font-medium text-xs', {
-                            'text-dark-grey': mode === 'light',
-                            'text-light-grey': mode === 'dark',
-                          })}
-                        >
-                          {`Due ${formatDate(invoice.paymentDue)}`}
-                        </p>
-                        <h2
-                          className={classNames('font-bold text-base', {
+                      <h2
+                        className={classNames(
+                          'font-bold text-base md:w-[15%]',
+                          {
                             'text-semi-black': mode === 'light',
                             'text-white': mode === 'dark',
-                          })}
-                        >
-                          {formatAmount(invoice.total)}
-                        </h2>
+                          }
+                        )}
+                      >
+                        {formatAmount(invoice.total)}
+                      </h2>
+                      <div className='md:w-[10%]'>
+                        <Status status={invoice.status} mode={mode} />
                       </div>
-                      <Status status={invoice.status} mode={mode} />
+
+                      <img src={rightArrow} alt='right arrow' />
                     </div>
                   </div>
                 )
