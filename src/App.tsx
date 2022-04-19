@@ -21,7 +21,7 @@ const App = () => {
 
   return (
     <div
-      className={classNames('h-screen', {
+      className={classNames('h-screen md:h-full md:flex', {
         'bg-light-purple': mode === 'light',
         'bg-black': mode === 'dark',
       })}
