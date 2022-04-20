@@ -27,6 +27,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   const [isLoading, setIsLoading] = useState(false)
   const [invoiceDetails, setInvoiceDetails] = useState(details)
   const [markAsPaid, setMarkAsPaid] = useState(false)
+  const [width] = useState(window.innerWidth)
 
   const dispatch = useDispatch()
   const { loading, singleInvoice } = useSelector(
@@ -102,7 +103,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
 
   return (
     <>
-      {showEdit ? (
+      {showEdit && width < 700 ? (
         <NewInvoice
           goBack={handleGoBack}
           type='edit'
@@ -500,12 +501,19 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         </>
       )}
 
+      {showEdit && width > 700 && (
+        <div className='invoice-overlay' onClick={() => setShowEdit(false)}>
+          <NewInvoice
+            goBack={handleGoBack}
+            type='edit'
+            details={details}
+            mode={mode}
+          />
+        </div>
+      )}
+
       {deleteInvoice && (
-        <Modal
-          handleClose={() => setDeleteInvoice(false)}
-          width='327px'
-          height='220px'
-        >
+        <Modal handleClose={() => setDeleteInvoice(false)}>
           <div
             className={classNames('p-6 rounded-md', {
               'bg-white': mode === 'light',

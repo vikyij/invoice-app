@@ -20,8 +20,7 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <div className='overlay' onClick={handleClose}>
       <div
-        className='w-11/12 h-60 bg-off-white flex flex-col justify-center items-center rounded-md'
-        style={{ width: width || '100px', height: height || '100px' }}
+        className='w-11/12 md:w-[480px] h-60 md:h-[249px] bg-off-white flex flex-col justify-center items-center rounded-md'
         onClick={handleClick}
       >
         {children}
