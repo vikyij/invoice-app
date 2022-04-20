@@ -14,6 +14,7 @@ import { AppState } from '../../redux/store'
 import { getInvoices } from '../../redux/effect/invoice'
 import { Loading } from '../../components/Loading'
 import rightArrow from '../../assets/images/icon-arrow-right.svg'
+import './home.css'
 
 const initialSingleDetail = {
   id: '',
@@ -124,9 +125,9 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
     setIsLoading(loading)
   }, [invoices, loading])
 
+
   const handleGoBack = () => {
     setShowNewInvoice(false)
-    dispatch(getInvoices())
   }
 
   useEffect(() => {
@@ -155,7 +156,7 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
           }}
           mode={mode}
         />
-      ) : showNewInvoice ? (
+      ) : showNewInvoice && width < 700 ? (
         <NewInvoice goBack={handleGoBack} type='new' mode={mode} />
       ) : (
         <div
@@ -472,6 +473,15 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
               })
             )}
           </>
+        </div>
+      )}
+
+      {showNewInvoice && width > 700 && (
+        <div
+          className='invoice-overlay'
+          onClick={() => setShowNewInvoice(false)}
+        >
+          <NewInvoice goBack={handleGoBack} type='new' mode={mode} />
         </div>
       )}
     </>

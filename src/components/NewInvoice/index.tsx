@@ -10,6 +10,7 @@ import { InlineLoader } from '../Loading'
 import { InputValidation } from '../../utils/validationSchema'
 import { InvoiceData } from '../../redux/interfaces/invoice'
 import classNames from 'classnames'
+import { getInvoices } from '../../redux/effect/invoice'
 
 interface NewInvoiceProps {
   type: string
@@ -77,6 +78,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
   const [itemErrors, setItemErrors] = useState(false)
   const [submitType, setSubmitType] = useState('')
   const [saved, setSaved] = useState(false)
+  const [width] = useState(window.innerWidth)
 
   const dispatch = useDispatch()
   const { loading, singleInvoice } = useSelector(
@@ -203,6 +205,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
         ])
         setItemErrors(false)
         window.alert('Invoice Created Successfully')
+        dispatch(getInvoices())
       }, 3000)
       return () => clearTimeout(clearInputs)
     } else {
@@ -248,34 +251,44 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
     return randomNum
   }
 
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation()
+  }
+
   return (
     <div
-      className={classNames({
-        'bg-white': mode === 'light',
-        'bg-black': mode === 'dark',
-      })}
+      className={classNames(
+        'md:scroll-smooth md:overflow-scroll md:rounded-tr-2xl md:rounded-br-2xl md:w-[45%] md:px-6',
+        {
+          'bg-white': mode === 'light',
+          'bg-black': mode === 'dark',
+        }
+      )}
+      onClick={handleClick}
     >
-      <div className='flex px-5 pt-8'>
-        <img
-          src={leftArrow}
-          alt='back arrow icon'
-          className='cursor-pointer'
-          onClick={() => {
-            type === 'new' ? goBack() : goBack(singleInvoice)
-          }}
-        />
-        <p
-          className={classNames('font-bold text-xs ml-6 cursor-pointer', {
-            'text-semi-black': mode === 'light',
-            'text-white': mode === 'dark',
-          })}
-          onClick={() => {
-            type === 'new' ? goBack() : goBack(singleInvoice)
-          }}
-        >
-          Go Back
-        </p>
-      </div>
+      {width < 700 && (
+        <div className='flex px-5 pt-8'>
+          <img
+            src={leftArrow}
+            alt='back arrow icon'
+            className='cursor-pointer'
+            onClick={() => {
+              type === 'new' ? goBack() : goBack(singleInvoice)
+            }}
+          />
+          <p
+            className={classNames('font-bold text-xs ml-6 cursor-pointer', {
+              'text-semi-black': mode === 'light',
+              'text-white': mode === 'dark',
+            })}
+            onClick={() => {
+              type === 'new' ? goBack() : goBack(singleInvoice)
+            }}
+          >
+            Go Back
+          </p>
+        </div>
+      )}
       <h1
         className={classNames('font-bold text-2xl my-8 px-5', {
           'text-semi-black': mode === 'light',
@@ -331,7 +344,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                 value={inputs.senderCity}
                 onChange={handleChange}
                 className={classNames(
-                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs',
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[160px] md:w-[152px] mt-2 p-4 text-xs',
                   {
                     'bg-white': mode === 'light',
                     'bg-dark-purple': mode === 'dark',
@@ -361,7 +374,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                 value={inputs.senderPostCode}
                 onChange={handleChange}
                 className={classNames(
-                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs',
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[160px] md:w-[152px] mt-2 p-4 text-xs',
                   {
                     'bg-white': mode === 'light',
                     'bg-dark-purple': mode === 'dark',
@@ -375,8 +388,38 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                 {errors?.senderPostCode}
               </span>
             </div>
+
+            <div className='flex-col hidden md:flex'>
+              <label
+                htmlFor='country'
+                className='font-normal text-xs text-grey-purple'
+              >
+                Country
+              </label>
+              <input
+                type='text'
+                id='country'
+                name='senderCountry'
+                value={inputs.senderCountry}
+                onChange={handleChange}
+                className={classNames(
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs hidden md:block',
+                  {
+                    'bg-white': mode === 'light',
+                    'bg-dark-purple': mode === 'dark',
+                    'border-[1px]': mode === 'light',
+                    'border-0': mode === 'dark',
+                    'text-white': mode === 'dark',
+                  }
+                )}
+              />
+
+              <span className='mt-5  text-xs text-[red]'>
+                {errors?.senderCountry}
+              </span>
+            </div>
           </div>
-          <div className='mt-4 mb-2'>
+          <div className='mt-4 mb-2 md:hidden'>
             <label
               htmlFor='country'
               className='font-normal text-xs text-grey-purple'
@@ -390,7 +433,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
               value={inputs.senderCountry}
               onChange={handleChange}
               className={classNames(
-                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs md:hidden',
                 {
                   'bg-white': mode === 'light',
                   'bg-dark-purple': mode === 'dark',
@@ -509,7 +552,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                 value={inputs.clientCity}
                 onChange={handleChange}
                 className={classNames(
-                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs',
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[160px] md:w-[152px] mt-2 p-4 text-xs',
                   {
                     'bg-white': mode === 'light',
                     'bg-dark-purple': mode === 'dark',
@@ -538,7 +581,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                 value={inputs.clientPostCode}
                 onChange={handleChange}
                 className={classNames(
-                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs',
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[160px] md:w-[152px] mt-2 p-4 text-xs',
                   {
                     'bg-white': mode === 'light',
                     'bg-dark-purple': mode === 'dark',
@@ -553,8 +596,37 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                 {errors?.clientPostCode}
               </span>
             </div>
+
+            <div className='flex-col hidden md:flex'>
+              <label
+                htmlFor='client-country'
+                className='font-normal text-xs text-grey-purple'
+              >
+                Country
+              </label>
+              <input
+                type='text'
+                id='client-country'
+                name='clientCountry'
+                value={inputs.clientCountry}
+                onChange={handleChange}
+                className={classNames(
+                  'rounded border-solid border-[#DFE3FA] h-12 w-[152px] mt-2 p-4 text-xs hidden md:block',
+                  {
+                    'bg-white': mode === 'light',
+                    'bg-dark-purple': mode === 'dark',
+                    'border-[1px]': mode === 'light',
+                    'border-0': mode === 'dark',
+                    'text-white': mode === 'dark',
+                  }
+                )}
+              />
+              <span className='mt-5  text-xs text-[red]'>
+                {errors?.clientCountry}
+              </span>
+            </div>
           </div>
-          <div className='mt-4 mb-2'>
+          <div className='mt-4 mb-2 md:hidden'>
             <label
               htmlFor='client-country'
               className='font-normal text-xs text-grey-purple'
@@ -568,7 +640,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
               value={inputs.clientCountry}
               onChange={handleChange}
               className={classNames(
-                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs md:hidden',
                 {
                   'bg-white': mode === 'light',
                   'bg-dark-purple': mode === 'dark',
@@ -582,59 +654,61 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
               {errors?.clientCountry}
             </span>
           </div>
-          <div className='mt-4 mb-2'>
-            <label
-              htmlFor='invoice-date'
-              className='font-normal text-xs text-grey-purple'
-            >
-              Invoice Date
-            </label>
-            <input
-              type='date'
-              id='invoice-date'
-              name='createdAt'
-              value={inputs.createdAt}
-              onChange={handleChange}
-              className={classNames(
-                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
-                {
-                  'bg-white': mode === 'light',
-                  'bg-dark-purple': mode === 'dark',
-                  'border-[1px]': mode === 'light',
-                  'border-0': mode === 'dark',
-                  'text-white': mode === 'dark',
-                }
-              )}
-            />
-          </div>
-          <div className='mt-4 mb-2'>
-            <label
-              htmlFor='payment-terms'
-              className='font-normal text-xs text-grey-purple'
-            >
-              Payment terms
-            </label>
-            <select
-              id='payment-terms'
-              name='paymentTerms'
-              value={paymentTerms}
-              onChange={handleSelectChange}
-              className={classNames(
-                'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 font-bold text-xs',
-                {
-                  'bg-white': mode === 'light',
-                  'bg-dark-purple': mode === 'dark',
-                  'border-[1px]': mode === 'light',
-                  'border-0': mode === 'dark',
-                  'text-white': mode === 'dark',
-                }
-              )}
-            >
-              <option value='1'>Net 1 Day</option>
-              <option value='7'>Net 7 Days</option>
-              <option value='14'>Net 14 Days</option>
-              <option value='30'>Net 30 Days</option>
-            </select>
+          <div className='md:flex md:justify-between'>
+            <div className='mt-4 mb-2'>
+              <label
+                htmlFor='invoice-date'
+                className='font-normal text-xs text-grey-purple'
+              >
+                Invoice Date
+              </label>
+              <input
+                type='date'
+                id='invoice-date'
+                name='createdAt'
+                value={inputs.createdAt}
+                onChange={handleChange}
+                className={classNames(
+                  'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 text-xs',
+                  {
+                    'bg-white': mode === 'light',
+                    'bg-dark-purple': mode === 'dark',
+                    'border-[1px]': mode === 'light',
+                    'border-0': mode === 'dark',
+                    'text-white': mode === 'dark',
+                  }
+                )}
+              />
+            </div>
+            <div className='mt-4 mb-2'>
+              <label
+                htmlFor='payment-terms'
+                className='font-normal text-xs text-grey-purple'
+              >
+                Payment terms
+              </label>
+              <select
+                id='payment-terms'
+                name='paymentTerms'
+                value={paymentTerms}
+                onChange={handleSelectChange}
+                className={classNames(
+                  'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 font-bold text-xs',
+                  {
+                    'bg-white': mode === 'light',
+                    'bg-dark-purple': mode === 'dark',
+                    'border-[1px]': mode === 'light',
+                    'border-0': mode === 'dark',
+                    'text-white': mode === 'dark',
+                  }
+                )}
+              >
+                <option value='1'>Net 1 Day</option>
+                <option value='7'>Net 7 Days</option>
+                <option value='14'>Net 14 Days</option>
+                <option value='30'>Net 30 Days</option>
+              </select>
+            </div>
           </div>
           <div className='mt-4 mb-2'>
             <label
@@ -669,10 +743,24 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
 
         <section className='mt-10 px-5'>
           <p className='font-bold text-lg text-[#777F98]'>Item List</p>
+          <header className='hidden md:flex justify-between mt-4'>
+            <th className='font-medium text-xs text-grey-purple w-[40%] text-left'>
+              Item Name
+            </th>
+            <th className='font-medium text-xs text-grey-purple w-[20%] text-left'>
+              QTY.
+            </th>
+            <th className='font-medium text-xs text-grey-purple w-[25%] text-left'>
+              Price
+            </th>
+            <th className='font-medium text-xs text-grey-purple w-[15%] text-left'>
+              Total
+            </th>
+          </header>
           {itemList.map((item, index) => {
             return (
-              <div className='mb-8' key={index}>
-                <div className='mt-4 mb-2'>
+              <div className='mb-8 md:mb-2' key={index}>
+                <div className='mt-4 mb-2 md:hidden'>
                   <label
                     htmlFor='item-name'
                     className='font-normal text-xs text-grey-purple'
@@ -700,15 +788,47 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                     )}
                     required
                   />
-                  <span className='mt-5  text-xs text-[red]'>
-                    {itemErrors ? item.name === '' && 'Enter Item name' : ''}
-                  </span>
+                  {itemErrors && (
+                    <span className='mt-5  text-xs text-[red]'>
+                      {itemErrors ? item.name === '' && 'Enter Item name' : ''}
+                    </span>
+                  )}
                 </div>
-                <div className='mt-5 mb-2 flex justify-between'>
+                <div className='mt-5 md:mt-2 mb-2 flex justify-between'>
+                  <div className='mb-2 hidden md:block'>
+                    <input
+                      type='text'
+                      id='item-name'
+                      name='itemName'
+                      value={item.name}
+                      onChange={(event) => {
+                        item.name = event.target.value
+                        setItemList([...itemList])
+                      }}
+                      className={classNames(
+                        'rounded border-solid border-[#DFE3FA] h-12 w-[150px] mt-2 p-4 text-xs',
+                        {
+                          'bg-white': mode === 'light',
+                          'bg-dark-purple': mode === 'dark',
+                          'border-[1px]': mode === 'light',
+                          'border-0': mode === 'dark',
+                          'text-white': mode === 'dark',
+                        }
+                      )}
+                      required
+                    />
+                    {itemErrors && (
+                      <span className='mt-5  text-xs text-[red]'>
+                        {itemErrors
+                          ? item.name === '' && 'Enter Item name'
+                          : ''}
+                      </span>
+                    )}
+                  </div>
                   <div className='flex flex-col'>
                     <label
                       htmlFor='quantity'
-                      className='font-normal text-xs text-grey-purple'
+                      className='font-normal text-xs text-grey-purple md:hidden'
                     >
                       Qty.
                     </label>
@@ -723,7 +843,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                         setItemList([...itemList])
                       }}
                       className={classNames(
-                        'rounded border-solid border-[#DFE3FA] h-12 w-16 mt-2 p-4 text-xs',
+                        'rounded border-solid border-[#DFE3FA] h-12 w-20 md:w-[65px] mt-2 p-4 text-xs',
                         {
                           'bg-white': mode === 'light',
                           'bg-dark-purple': mode === 'dark',
@@ -734,17 +854,19 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                       )}
                       required
                     />
-                    <span className='mt-5  text-xs text-[red]'>
-                      {itemErrors
-                        ? item.quantity === '' && 'Enter quantity'
-                        : ''}
-                    </span>
+                    {itemErrors && (
+                      <span className='mt-5  text-xs text-[red]'>
+                        {itemErrors
+                          ? item.quantity === '' && 'Enter quantity'
+                          : ''}
+                      </span>
+                    )}
                   </div>
 
                   <div className='flex flex-col'>
                     <label
                       htmlFor='price'
-                      className='font-normal text-xs text-grey-purple'
+                      className='font-normal text-xs text-grey-purple md:hidden'
                     >
                       Price
                     </label>
@@ -759,7 +881,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                         setItemList([...itemList])
                       }}
                       className={classNames(
-                        'rounded border-solid border-[#DFE3FA] h-12 w-[100px] mt-2 p-4 text-xs',
+                        'rounded border-solid border-[#DFE3FA] h-12 w-[120px] md:w-[100px] mt-2 p-4 text-xs',
                         {
                           'bg-white': mode === 'light',
                           'bg-dark-purple': mode === 'dark',
@@ -770,20 +892,22 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                       )}
                       required
                     />
-                    <span className='mt-5  text-xs text-[red]'>
-                      {itemErrors ? item.price === '' && 'Enter price' : ''}
-                    </span>
+                    {itemErrors && (
+                      <span className='mt-5  text-xs text-[red]'>
+                        {itemErrors ? item.price === '' && 'Enter price' : ''}
+                      </span>
+                    )}
                   </div>
 
-                  <div className='flex flex-col'>
-                    <p className='font-normal text-xs text-grey-purple'>
+                  <div className='flex flex-col md:w-[100px]'>
+                    <p className='font-normal text-xs text-grey-purple md:hidden'>
                       Total
                     </p>
                     <p className='font-bold text-xs text-dark-grey mt-6'>
                       {formatAmount(item.total)}
                     </p>
                   </div>
-                  <div className='mt-10'>
+                  <div className='mt-10 md:mt-6'>
                     <img
                       src={deleteIcon}
                       alt='delete-item'

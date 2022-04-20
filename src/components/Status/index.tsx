@@ -11,10 +11,10 @@ const Status: React.FC<StatusProps> = ({ status, mode }) => {
       className={classNames(
         'w-24 h-10 rounded-md flex items-center justify-center',
         {
-          'bg-[#F4FDFA]': status === 'paid',
-          'bg-[#FFF9F0]': status === 'pending',
+          'bg-[#F4FDFA]': status === 'paid' && mode !== 'dark',
+          'bg-[#FFF9F0]': status === 'pending' && mode !== 'dark',
           'bg-[#F4F4F5]': status === 'draft' && mode !== 'dark',
-          'bg-[#1F2C3F]': mode === 'dark' && status === 'draft',
+          'bg-[#1F2C3F]': mode === 'dark',
         }
       )}
     >
