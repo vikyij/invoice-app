@@ -11,6 +11,7 @@ import { InputValidation } from '../../utils/validationSchema'
 import { InvoiceData } from '../../redux/interfaces/invoice'
 import classNames from 'classnames'
 import { getInvoices } from '../../redux/effect/invoice'
+import Toast from '../Toast'
 
 interface NewInvoiceProps {
   type: string
@@ -79,7 +80,8 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
   const [submitType, setSubmitType] = useState('')
   const [saved, setSaved] = useState(false)
   const [width] = useState(window.innerWidth)
-
+  const [showToast, setShowToast] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const dispatch = useDispatch()
   const { loading, singleInvoice } = useSelector(
     (state: AppState) => state.invoices
@@ -154,7 +156,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
 
   const handleSubmit = (status: string) => {
     let total = itemList.reduce((total, item) => total + item.total, 0)
-
+    setShowToast(false)
     let invoiceDate = new Date(inputs.createdAt)
     let length = parseInt(paymentTerms)
     let dueDate = new Date(invoiceDate.setDate(invoiceDate.getDate() + length))
@@ -204,15 +206,17 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
           },
         ])
         setItemErrors(false)
-        window.alert('Invoice Created Successfully')
+        setShowToast(true)
+        setSuccessMessage('Invoice Created Successfully')
         dispatch(getInvoices())
-      }, 3000)
+      }, 2000)
       return () => clearTimeout(clearInputs)
     } else {
       const showAlert = setTimeout(() => {
-        window.alert('Edited Successfully')
+        setShowToast(true)
+        setSuccessMessage('Edited Successfully')
         setSaved(true)
-      }, 3000)
+      }, 2000)
       return () => clearTimeout(showAlert)
     }
   }
@@ -266,6 +270,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       )}
       onClick={handleClick}
     >
+
       {width < 700 && (
         <div className='flex px-5 pt-8'>
           <img
@@ -297,6 +302,8 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       >
         {type === 'edit' ? `Edit #${details?.id}` : 'New Invoice'}
       </h1>
+      {showToast && <Toast type='success' message={successMessage} />}
+
       <div>
         <section className='px-5'>
           <p className='font-bold text-xs text-[#7C5DFA]'>Bill From</p>
