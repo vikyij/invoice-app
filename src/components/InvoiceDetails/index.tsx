@@ -10,6 +10,7 @@ import { editInvoice, deleteInvoiceApi } from '../../redux/effect/invoice'
 import { AppState } from '../../redux/store'
 import { InlineLoader } from '../Loading'
 import classNames from 'classnames'
+import Toast from '../Toast'
 
 interface InvoiceDetailsProps {
   details: InvoiceData
@@ -28,7 +29,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   const [invoiceDetails, setInvoiceDetails] = useState(details)
   const [markAsPaid, setMarkAsPaid] = useState(false)
   const [width] = useState(window.innerWidth)
-
+  const [showToast, setShowToast] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const dispatch = useDispatch()
   const { loading, singleInvoice } = useSelector(
     (state: AppState) => state.invoices
@@ -74,7 +76,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
     dispatch(editInvoice(invoicePayload))
 
     const showAlert = setTimeout(() => {
-      window.alert('Successful')
+      setShowToast(true)
+      setSuccessMessage('Successful')
       setMarkAsPaid(false)
     }, 3000)
 
@@ -92,12 +95,19 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
     if (id) {
       dispatch(deleteInvoiceApi(id))
       const showAlert = setTimeout(() => {
-        window.alert('Invoice deleted Successful')
+        setShowToast(true)
+        setSuccessMessage('Deleted Successfully')
         setDeleteInvoice(false)
-        goBack()
-      }, 3000)
+      }, 2000)
 
-      return () => clearTimeout(showAlert)
+      const goHome = setTimeout(() => {
+        goBack()
+      }, 7000)
+
+      return () => {
+        clearTimeout(showAlert)
+        clearTimeout(goHome)
+      }
     }
   }
 
@@ -138,6 +148,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 Go Back
               </p>
             </div>
+            {showToast && <Toast type='success' message={successMessage} />}
+
             <div
               className={classNames(
                 'w-full h-24 rounded-lg mt-10 mb-4 p-6 flex justify-between items-center',
