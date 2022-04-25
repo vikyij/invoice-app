@@ -6,21 +6,21 @@ import leftArrow from '../../assets/images/icon-arrow-left.svg'
 import { useDispatch, useSelector } from 'react-redux'
 import { addNewInvoice, editInvoice } from '../../redux/effect/invoice'
 import { AppState } from '../../redux/store'
-import { InlineLoader } from '../Loading'
 import { InputValidation } from '../../utils/validationSchema'
 import { InvoiceData } from '../../redux/interfaces/invoice'
 import classNames from 'classnames'
 import { getInvoices } from '../../redux/effect/invoice'
 import Toast from '../Toast'
+import Footer from '../Footer'
 
-interface NewInvoiceProps {
+type NewInvoiceProps = {
   type: string
   details?: InvoiceData
   goBack: (newDetails?: InvoiceData) => void
   mode: string
 }
 
-interface Items {
+type Items = {
   id: string
   name: string
   quantity: string
@@ -28,7 +28,7 @@ interface Items {
   total: number
 }
 
-interface Inputs {
+type Inputs = {
   senderStreet: string
   senderCity: string
   senderCountry: string
@@ -41,6 +41,7 @@ interface Inputs {
   clientPostCode: string
   createdAt: string
   description: string
+  paymentTerms: string
 }
 
 const NewInvoice: React.FC<NewInvoiceProps> = ({
@@ -62,6 +63,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
     clientPostCode: '',
     createdAt: '',
     description: '',
+    paymentTerms: '1',
   }
   const [itemList, setItemList] = useState<Items[]>([
     {
@@ -74,7 +76,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
   ])
   const [isLoading, setIsLoading] = useState(false)
   const [inputs, setInputs] = useState<Inputs>(initialInputState)
-  const [paymentTerms, setPaymentTerms] = useState('30')
   const [errors, setErrors] = useState<Inputs>(initialInputState)
   const [itemErrors, setItemErrors] = useState(false)
   const [submitType, setSubmitType] = useState('')
@@ -106,9 +107,10 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
         clientPostCode: details?.clientAddress?.postCode,
         createdAt: details?.createdAt,
         description: details?.description,
+        paymentTerms: details?.paymentTerms,
       })
 
-      setPaymentTerms(details?.paymentTerms)
+      // setPaymentTerms(details?.paymentTerms)
       let items = details?.items.map((item) => item)
 
       setItemList(items)
@@ -145,20 +147,18 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
     }
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = event.target
     setInputs((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setPaymentTerms(event.target.value)
   }
 
   const handleSubmit = (status: string) => {
     let total = itemList.reduce((total, item) => total + item.total, 0)
     setShowToast(false)
     let invoiceDate = new Date(inputs.createdAt)
-    let length = parseInt(paymentTerms)
+    let length = parseInt(inputs?.paymentTerms)
     let dueDate = new Date(invoiceDate.setDate(invoiceDate.getDate() + length))
 
     const invoicePayload = {
@@ -183,7 +183,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       clientEmail: inputs.clientEmail,
       items: itemList,
       total: total,
-      paymentTerms: paymentTerms,
+      paymentTerms: inputs?.paymentTerms,
     }
 
     if (type === 'edit') {
@@ -242,6 +242,16 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       })
   }
 
+  const handleSaveChanges = () => {
+    handleSend()
+    setSubmitType('pending')
+  }
+
+  const handleSaveAsDraft = () => {
+    handleSubmit('draft')
+    setSubmitType('draft')
+  }
+
   const generateId = () => {
     let randomNum = ''
     let alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -270,7 +280,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       )}
       onClick={handleClick}
     >
-
       {width < 700 && (
         <div className='flex px-5 pt-8'>
           <img
@@ -697,8 +706,8 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
               <select
                 id='payment-terms'
                 name='paymentTerms'
-                value={paymentTerms}
-                onChange={handleSelectChange}
+                value={inputs?.paymentTerms}
+                onChange={handleChange}
                 className={classNames(
                   'rounded border-solid border-[#DFE3FA] h-12 w-full mt-2 p-4 font-bold text-xs',
                   {
@@ -750,20 +759,20 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
 
         <section className='mt-10 px-5'>
           <p className='font-bold text-lg text-[#777F98]'>Item List</p>
-          <header className='hidden md:flex justify-between mt-4'>
-            <th className='font-medium text-xs text-grey-purple w-[40%] text-left'>
+          <div className='hidden md:flex justify-between mt-4'>
+            <p className='font-medium text-xs text-grey-purple w-[40%] text-left'>
               Item Name
-            </th>
-            <th className='font-medium text-xs text-grey-purple w-[20%] text-left'>
+            </p>
+            <p className='font-medium text-xs text-grey-purple w-[20%] text-left'>
               QTY.
-            </th>
-            <th className='font-medium text-xs text-grey-purple w-[25%] text-left'>
+            </p>
+            <p className='font-medium text-xs text-grey-purple w-[25%] text-left'>
               Price
-            </th>
-            <th className='font-medium text-xs text-grey-purple w-[15%] text-left'>
+            </p>
+            <p className='font-medium text-xs text-grey-purple w-[15%] text-left'>
               Total
-            </th>
-          </header>
+            </p>
+          </div>
           {itemList.map((item, index) => {
             return (
               <div className='mb-8 md:mb-2' key={index}>
@@ -843,6 +852,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                       type='number'
                       id='quantity'
                       name='quantity'
+                      min='0'
                       value={item.quantity}
                       onChange={(event) => {
                         item.quantity = event.target.value
@@ -881,6 +891,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                       type='number'
                       id='price'
                       name='price'
+                      min='0'
                       value={item.price}
                       onChange={(event) => {
                         item.price = event.target.value
@@ -906,7 +917,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
                     )}
                   </div>
 
-                  <div className='flex flex-col md:w-[100px]'>
+                  <div className='flex flex-col w-[100px]'>
                     <p className='font-normal text-xs text-grey-purple md:hidden'>
                       Total
                     </p>
@@ -942,92 +953,17 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
             + Add New Item
           </button>
         </div>
-        <footer
-          className={classNames(
-            'flex justify-end items-center p-6 h-28 mt-10',
-            {
-              'bg-[#F9FAFE]': mode === 'light',
-              'bg-dark-purple': mode === 'dark',
-            }
-          )}
-        >
-          {type === 'edit' ? (
-            <>
-              <button
-                onClick={handleReset}
-                className={classNames(
-                  'font-bold text-xs text-grey-purple  rounded-3xl w-24 h-12 mr-2',
-                  {
-                    'bg-light-purple': mode === 'light',
-                    'bg-[#252945]': mode === 'dark',
-                  }
-                )}
-              >
-                Cancel
-              </button>
 
-              <button
-                type='submit'
-                onClick={() => {
-                  handleSend()
-                  setSubmitType('pending')
-                }}
-                className='font-bold text-xs text-white rounded-3xl w-[138px] h-12 bg-[#7C5DFA]'
-              >
-                {submitType === 'pending' && isLoading ? (
-                  <InlineLoader />
-                ) : (
-                  'Save Changes'
-                )}
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => goBack()}
-                className={classNames(
-                  'font-bold text-xs text-grey-purple rounded-3xl w-24 h-12 mr-2',
-                  {
-                    'bg-light-purple': mode === 'light',
-                    'bg-[#252945]': mode === 'dark',
-                  }
-                )}
-              >
-                Discard
-              </button>
-
-              <button
-                type='submit'
-                onClick={() => {
-                  handleSubmit('draft')
-                  setSubmitType('draft')
-                }}
-                className='font-bold text-xs text-dark-grey bg-dark-blue rounded-3xl w-[138px] h-12 mr-2'
-              >
-                {submitType === 'draft' && isLoading ? (
-                  <InlineLoader />
-                ) : (
-                  'Save as Draft'
-                )}
-              </button>
-
-              <button
-                type='submit'
-                onClick={() => {
-                  handleSend()
-                  setSubmitType('pending')
-                }}
-                className='font-bold text-xs text-white bg-[#7C5DFA] rounded-3xl w-[138px] h-12'
-              >
-                {submitType === 'pending' && isLoading ? (
-                  <InlineLoader />
-                ) : (
-                  'Save & Send'
-                )}
-              </button>
-            </>
-          )}
-        </footer>
+        <Footer
+          mode={mode}
+          handleReset={handleReset}
+          handleSaveChanges={handleSaveChanges}
+          submitType={submitType}
+          goBack={goBack}
+          isLoading={isLoading}
+          handleSaveAsDraft={handleSaveAsDraft}
+          type={type}
+        />
       </div>
     </div>
   )

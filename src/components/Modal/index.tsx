@@ -8,12 +8,7 @@ interface ModalProps {
   handleClose?: () => void
 }
 
-const Modal: React.FC<ModalProps> = ({
-  handleClose,
-  children,
-  width,
-  height,
-}) => {
+const Modal: React.FC<ModalProps> = ({ handleClose, children }) => {
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation()
   }

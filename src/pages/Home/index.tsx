@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useReducer } from 'react'
+import { useState, useEffect, useReducer } from 'react'
 import classNames from 'classnames'
-import downArrow from '../../assets/images/icon-arrow-down.svg'
 import plusIcon from '../../assets/images/icon-plus.svg'
-import checkIcon from '../../assets/images/icon-check.svg'
 import EmptyState from '../../components/EmptyState'
 import Status from '../../components/Status'
 import InvoiceDetails from '../../components/InvoiceDetails'
@@ -14,6 +12,7 @@ import { AppState } from '../../redux/store'
 import { getInvoices } from '../../redux/effect/invoice'
 import { Loading } from '../../components/Loading'
 import rightArrow from '../../assets/images/icon-arrow-right.svg'
+import Filter from '../../components/Filter'
 import './home.css'
 
 const initialSingleDetail = {
@@ -55,11 +54,11 @@ enum filterActionType {
   paid = 'PAID',
 }
 
-interface filterAction {
+type filterAction = {
   type: filterActionType
 }
 
-interface filterState {
+type filterState = {
   draft: boolean
   pending: boolean
   paid: boolean
@@ -87,11 +86,7 @@ const filterReducer = (state: filterState, action: filterAction) => {
   }
 }
 
-interface HomeProps {
-  mode: string
-}
-
-const Home: React.FC<HomeProps> = ({ mode }) => {
+const Home = ({ mode }: { mode: string }) => {
   const [invoiceData, setInvoiceData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
@@ -125,7 +120,6 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
     setIsLoading(loading)
   }, [invoices, loading])
 
-
   const handleGoBack = () => {
     setShowNewInvoice(false)
   }
@@ -144,6 +138,22 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
   }, [filterState])
 
   const displayData = filteredData.length !== 0 ? filteredData : invoiceData
+
+  const handleFilter = () => {
+    setShowfilter(!showFilter)
+  }
+
+  const handleDraft = () => {
+    filterDispatch({ type: filterActionType.draft })
+  }
+
+  const handlePending = () => {
+    filterDispatch({ type: filterActionType.pending })
+  }
+
+  const handlePaid = () => {
+    filterDispatch({ type: filterActionType.paid })
+  }
 
   return (
     <>
@@ -185,151 +195,16 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
               </p>
             </div>
             <div className='flex items-center'>
-              <div className='mr-4 md:mr-7 flex flex-col items-center'>
-                <div
-                  className='flex items-center cursor-pointer'
-                  onClick={() => setShowfilter(!showFilter)}
-                >
-                  <p
-                    className={classNames('font-bold text-sm mr-2', {
-                      'text-semi-black': mode === 'light',
-                      'text-white': mode === 'dark',
-                    })}
-                  >
-                    {width > 700 ? `Filter by status` : `Filter`}
-                  </p>
-                  <img
-                    src={downArrow}
-                    className='w-2 h-2'
-                    alt='filter-dropdown-icon'
-                  />
-                </div>
+              <Filter
+                mode={mode}
+                showFilter={showFilter}
+                filterState={filterState}
+                handleFilter={handleFilter}
+                handleDraft={handleDraft}
+                handlePending={handlePending}
+                handlePaid={handlePaid}
+              />
 
-                <div
-                  className={classNames(
-                    'w-28 md:w-48 rounded-lg shadow-3xl absolute mt-10 transition-transform p-4 pt-5 md:p-5',
-                    {
-                      hidden: !showFilter,
-                      block: showFilter,
-                      'h-32': showFilter,
-                      'bg-white': mode === 'light',
-                      'bg-dark-purple': mode === 'dark',
-                    }
-                  )}
-                >
-                  <div
-                    className='flex mb-4'
-                    onClick={() => {
-                      filterDispatch({ type: filterActionType.draft })
-                    }}
-                  >
-                    <div
-                      className={classNames(
-                        'rounded-sm w-4 h-4 mr-3 cursor-pointer',
-                        {
-                          'bg-[#DFE3FA]': !filterState.draft,
-                          'bg-purple': filterState.draft,
-                        }
-                      )}
-                      data-id='draft'
-                    >
-                      <img
-                        src={checkIcon}
-                        className={classNames('my-[0px] mx-[auto] pt-[3px]', {
-                          hidden: !filterState.draft,
-                          block: filterState.draft,
-                        })}
-                        alt='checked icon'
-                      />
-                    </div>
-                    <p
-                      className={classNames(
-                        'text-xs font-bold cursor-pointer',
-                        {
-                          'text-semi-black': mode === 'light',
-                          'text-white': mode === 'dark',
-                        }
-                      )}
-                    >
-                      Draft
-                    </p>
-                  </div>
-                  <div
-                    className='flex mb-4'
-                    onClick={() => {
-                      filterDispatch({ type: filterActionType.pending })
-                    }}
-                  >
-                    <div
-                      className={classNames(
-                        'rounded-sm w-4 h-4 mr-3 cursor-pointer',
-                        {
-                          'bg-[#DFE3FA]': !filterState.pending,
-                          'bg-purple': filterState.pending,
-                        }
-                      )}
-                      data-id='pending'
-                    >
-                      <img
-                        src={checkIcon}
-                        className={classNames('my-[0px] mx-[auto] pt-[3px]', {
-                          hidden: !filterState.pending,
-                          block: filterState.pending,
-                        })}
-                        alt='checked icon'
-                      />
-                    </div>
-                    <p
-                      className={classNames(
-                        'text-xs font-bold cursor-pointer',
-                        {
-                          'text-semi-black': mode === 'light',
-                          'text-white': mode === 'dark',
-                        }
-                      )}
-                    >
-                      Pending
-                    </p>
-                  </div>
-                  <div
-                    className='flex'
-                    onClick={() => {
-                      filterDispatch({ type: filterActionType.paid })
-                    }}
-                  >
-                    <div
-                      className={classNames(
-                        'rounded-sm w-4 h-4 mr-3 cursor-pointer',
-                        {
-                          'bg-[#DFE3FA]': !filterState.paid,
-                          'bg-purple': filterState.paid,
-                        }
-                      )}
-                      data-id='paid'
-                    >
-                      <img
-                        src={checkIcon}
-                        className={classNames('my-[0px] mx-[auto] pt-[3px]', {
-                          hidden: !filterState.paid,
-                          block: filterState.paid,
-                        })}
-                        alt='checked icon'
-                      />
-                    </div>
-                    <p
-                      className={classNames(
-                        'text-xs font-bold cursor-pointer',
-                        {
-                          'text-semi-black': mode === 'light',
-                          'text-white': mode === 'dark',
-                        }
-                      )}
-                    >
-                      Paid
-                    </p>
-                  </div>
-                </div>
-              </div>
               <div
                 className='w-[90px] md:w-[150px] h-10 rounded-3xl bg-purple flex items-center cursor-pointer'
                 onClick={() => setShowNewInvoice(true)}
@@ -342,7 +217,6 @@ const Home: React.FC<HomeProps> = ({ mode }) => {
                   />
                 </div>
                 <p className='text-white font-bold text-xs'>
-                  {' '}
                   {width > 700 ? `New invoice` : `New`}
                 </p>
               </div>
