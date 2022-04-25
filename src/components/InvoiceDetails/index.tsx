@@ -12,7 +12,7 @@ import { InlineLoader } from '../Loading'
 import classNames from 'classnames'
 import Toast from '../Toast'
 
-interface InvoiceDetailsProps {
+type InvoiceDetailsProps = {
   details: InvoiceData
   goBack: () => void
   mode: string
@@ -117,7 +117,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         <NewInvoice
           goBack={handleGoBack}
           type='edit'
-          details={details}
+          details={invoiceDetails}
           mode={mode}
         />
       ) : (
@@ -371,18 +371,14 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                   }
                 )}
               >
-                <header className='hidden md:flex justify-between'>
-                  <th className='font-medium text-xs text-grey-purple'>
+                <div className='hidden md:flex justify-between'>
+                  <p className='font-medium text-xs text-grey-purple'>
                     Item Name
-                  </th>
-                  <th className='font-medium text-xs text-grey-purple'>QTY.</th>
-                  <th className='font-medium text-xs text-grey-purple'>
-                    Price
-                  </th>
-                  <th className='font-medium text-xs text-grey-purple'>
-                    Total
-                  </th>
-                </header>
+                  </p>
+                  <p className='font-medium text-xs text-grey-purple'>QTY.</p>
+                  <p className='font-medium text-xs text-grey-purple'>Price</p>
+                  <p className='font-medium text-xs text-grey-purple'>Total</p>
+                </div>
                 {invoiceDetails?.items.map((item) => {
                   return (
                     <div
