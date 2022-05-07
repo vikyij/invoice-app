@@ -9,7 +9,7 @@ export const Loading = ({ mode }: { mode: string }) => {
           <div
             key={index + 1}
             className={classNames(
-              'w-full h-36 rounded-lg  mt-4 p-4 py-6 cursor-pointer',
+              'w-full h-36 rounded-lg  mt-4 p-4 py-6 cursor-pointer loading',
               {
                 'bg-white': mode === 'light',
                 'bg-dark-purple': mode === 'dark',

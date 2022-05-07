@@ -190,7 +190,11 @@ const Home = ({ mode }: { mode: string }) => {
               </h1>
               <p className='text-dark-grey tracking-tight text-xs font-medium'>
                 {width > 700
-                  ? `There are ${invoiceData?.length} invoices`
+                  ? invoiceData?.length === 1
+                    ? 'There is 1 invoice'
+                    : `There are ${invoiceData?.length} invoices`
+                  : width < 700 && invoiceData?.length === 1
+                  ? '1 invoice'
                   : `${invoiceData?.length} invoices`}
               </p>
             </div>
@@ -228,7 +232,7 @@ const Home = ({ mode }: { mode: string }) => {
             ) : invoiceData?.length === 0 ? (
               <EmptyState mode={mode} />
             ) : (
-              displayData?.map((invoice: InvoiceData) => {
+              displayData?.map((invoice: InvoiceData, index) => {
                 return (
                   <div
                     className={classNames(
@@ -238,6 +242,7 @@ const Home = ({ mode }: { mode: string }) => {
                         'bg-dark-purple': mode === 'dark',
                       }
                     )}
+                    data-testid={`div-wrapper-${index}`}
                     key={invoice.id}
                     onClick={() => handleShowDetails(invoice)}
                   >
