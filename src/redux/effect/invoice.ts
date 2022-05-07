@@ -6,7 +6,7 @@ import { InvoiceData } from '../interfaces/invoice'
 export const getInvoices = () => {
   return function (dispatch: Dispatch<InvoiceActionTypes>) {
     dispatch(getInvoiceAction(invoiceStateTypes.LOADING,true))
-    fetch('http://localhost:3000/invoices')
+    return fetch('http://localhost:3000/invoices')
       .then(res => res.json())
       .then(data => {
         dispatch(getInvoiceAction(invoiceStateTypes.LOADING, false))
