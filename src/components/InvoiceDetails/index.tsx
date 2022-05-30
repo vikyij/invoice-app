@@ -554,7 +554,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
               </button>
               <button
                 onClick={() => handleDelete(invoiceDetails?.id)}
-                className='font-bold text-xs text-white bg-[#EC5757] rounded-3xl w-[89px] h-12'
+                className='font-bold text-xs text-white bg-[#EC5757] rounded-3xl w-[89px] h-12 modal-delete'
               >
                 {deleteInvoice && isLoading ? <InlineLoader /> : 'Delete'}
               </button>
