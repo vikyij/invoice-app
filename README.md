@@ -11,36 +11,78 @@ In the project directory, you can run:
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+# Frontend Mentor - Invoice app solution
 
-### `npm test`
+This is a solution to the [Invoice app challenge on Frontend Mentor](https://www.frontendmentor.io/challenges/invoice-app-i7KaLTQjl). Frontend Mentor challenges help you improve your coding skills by building realistic projects. 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+## Overview
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### The challenge
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Users should be able to:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- View the optimal layout for the app depending on their device's screen size
+- See hover states for all interactive elements on the page
+- Create, read, update, and delete invoices
+- Receive form validations when trying to create/edit an invoice
+- Save draft invoices, and mark pending invoices as paid
+- Filter invoices by status (draft/pending/paid)
+- Toggle light and dark mode
+- **Bonus**: Keep track of any changes, even after refreshing the browser (`localStorage` could be used for this if you're not building out a full-stack app)
 
-### `npm run eject`
+### Screenshot
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Links
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Solution URL: https://github.com/vikyij/invoice-app
+- Live Site URL: https://invoice-c6nx28o4e-vikyij.vercel.app/
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## My process
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Built with
+
+- Semantic HTML5 markup
+- CSS custom properties
+- tailwind css
+- Mobile-first workflow
+- [React](https://reactjs.org/) - JS library
+- Redux
+- React testing library and jest
+
+
+
+### What I learned
+
+Use this section to recap over some of your major learnings while working through this project. Writing these out and providing code samples of areas you want to highlight is a great way to reinforce your own knowledge.
+
+I learnt unit, integration and end to end testing with react testing library, jest and cypress
+I learnt how to make requests with json server and mock requests with msw
+I learnt typescript
+
+### Continued development
+
+I'll like to learn and use the latest version of redux
+
+
+### Useful resources
+
+- https://dev.to/zaklaughton/the-only-3-steps-you-need-to-mock-an-api-call-in-jest-39mb
+- https://mswjs.io/docs/
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+
+
+## Author
+
+- Frontend Mentor - [@vikyij](https://www.frontendmentor.io/profile/vikyij)
+- Twitter - [@vikyij](https://www.twitter.com/vikyij)
+
+
+## Acknowledgments
+
+Special shoutout to @bondz for helping to unblock me when I face a roadblocks and sharing useful resources with me
+
+
