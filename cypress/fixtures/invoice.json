@@ -30,5 +30,37 @@
     ],
     "total": 5000,
     "paymentTerms": "7"
+  },
+  {
+    "id": "AB8862",
+    "status": "pending",
+    "description": "Payment invoice for luxury",
+    "senderAddress": {
+      "street": "Banana Island, Ikoyi",
+      "city": "c28 MM2 Ikeja",
+      "postCode": "100200",
+      "country": "Nigeria"
+    },
+    "createdAt": "2022-05-19",
+    "paymentDue": "2022-05-20T00:00:00.000Z",
+    "clientName": "Daniel Regha",
+    "clientAddress": {
+      "street": "minnesota street",
+      "city": "London",
+      "postCode": "200100",
+      "country": "United Kingdom"
+    },
+    "clientEmail": "dan@gmail.com",
+    "items": [
+      {
+        "id": "99a4acfc-cfcf-4ec9-835f-647f16c562ae",
+        "name": "iPhone 13 pro max",
+        "quantity": "1",
+        "price": "500000",
+        "total": 500000
+      }
+    ],
+    "total": 500000,
+    "paymentTerms": "1"
   }
 ]

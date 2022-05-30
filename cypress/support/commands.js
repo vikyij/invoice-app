@@ -23,3 +23,21 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('getInvoiceApi', (data) => {
+  cy.intercept(
+    {
+      method: 'GET',
+      url: 'http://localhost:3000/invoices',
+    },
+    {
+      statusCode: 200,
+      fixture: data,
+    }
+  ).as('getInvoices')
+  cy.visit('http://localhost:3001/')
+
+  cy.wait('@getInvoices').then(({ response }) => {
+    assert.isNotNull(response.body, 'Api call has data')
+  })
+})
