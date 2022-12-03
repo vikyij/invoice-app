@@ -1,5 +1,5 @@
 export interface InvoiceData {
-  status: string
+  data: {status: string
   id?: string
   description: string
   senderAddress: {
@@ -27,6 +27,9 @@ export interface InvoiceData {
   }[]
   total: number
   paymentTerms: string
+
+},
+id: string
 }
 
 export type Inputs = {

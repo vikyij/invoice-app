@@ -12,6 +12,9 @@ import classNames from 'classnames'
 import { getInvoices } from '../../redux/effect/invoice'
 import Toast from '../Toast'
 import Footer from '../Footer'
+import { db } from '../../firebase'
+import { collection, addDoc, Timestamp } from 'firebase/firestore'
+import { doc, updateDoc } from 'firebase/firestore'
 
 type NewInvoiceProps = {
   type: string
@@ -95,23 +98,23 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
   const initialDetails = useCallback(() => {
     if (details) {
       setInputs({
-        senderStreet: details?.senderAddress?.street,
-        senderCity: details?.senderAddress?.city,
-        senderCountry: details?.senderAddress?.country,
-        senderPostCode: details?.senderAddress?.postCode,
-        clientName: details?.clientName,
-        clientEmail: details?.clientEmail,
-        clientStreet: details?.clientAddress?.street,
-        clientCity: details?.clientAddress?.city,
-        clientCountry: details?.clientAddress?.country,
-        clientPostCode: details?.clientAddress?.postCode,
-        createdAt: details?.createdAt,
-        description: details?.description,
-        paymentTerms: details?.paymentTerms,
+        senderStreet: details?.data?.senderAddress?.street,
+        senderCity: details?.data?.senderAddress?.city,
+        senderCountry: details?.data?.senderAddress?.country,
+        senderPostCode: details?.data?.senderAddress?.postCode,
+        clientName: details?.data?.clientName,
+        clientEmail: details?.data?.clientEmail,
+        clientStreet: details?.data?.clientAddress?.street,
+        clientCity: details?.data?.clientAddress?.city,
+        clientCountry: details?.data?.clientAddress?.country,
+        clientPostCode: details?.data?.clientAddress?.postCode,
+        createdAt: details?.data?.createdAt,
+        description: details?.data?.description,
+        paymentTerms: details?.data?.paymentTerms,
       })
 
       // setPaymentTerms(details?.paymentTerms)
-      let items = details?.items.map((item) => item)
+      let items = details?.data?.items.map((item) => item)
 
       setItemList(items)
     }
@@ -154,7 +157,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
     setInputs((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (status: string) => {
+  const handleSubmit = async (status: string) => {
     let total = itemList.reduce((total, item) => total + item.total, 0)
     setShowToast(false)
     let invoiceDate = new Date(inputs.createdAt)
@@ -162,7 +165,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
     let dueDate = new Date(invoiceDate.setDate(invoiceDate.getDate() + length))
 
     const invoicePayload = {
-      id: type === 'new' ? generateId() : details?.id,
+      id: type === 'new' ? generateId() : details?.data?.id,
       status: status,
       description: inputs.description,
       senderAddress: {
@@ -184,40 +187,60 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       items: itemList,
       total: total,
       paymentTerms: inputs?.paymentTerms,
+      created: Timestamp.now(),
     }
-
+    console.log('here', invoicePayload)
+    setIsLoading(true)
     if (type === 'edit') {
-      dispatch(editInvoice(invoicePayload))
-    } else {
-      dispatch(addNewInvoice(invoicePayload))
-    }
+      // dispatch(editInvoice(invoicePayload))
 
-    if (type === 'new') {
-      const clearInputs = setTimeout(() => {
-        setInputs(initialInputState)
-        setErrors(initialInputState)
-        setItemList([
-          {
-            id: uuidv4(),
-            name: '',
-            quantity: '',
-            price: '',
-            total: 0,
-          },
-        ])
-        setItemErrors(false)
-        setShowToast(true)
-        setSuccessMessage('Invoice Created Successfully')
-        dispatch(getInvoices())
-      }, 2000)
-      return () => clearTimeout(clearInputs)
+      const taskDocRef = details
+        ? doc(db, 'invoice', details.id)
+        : doc(db, 'invoice', '124')
+      try {
+        await updateDoc(taskDocRef, invoicePayload)
+
+        const showAlert = setTimeout(() => {
+          setShowToast(true)
+          setSuccessMessage('Edited Successfully')
+          setSaved(true)
+          setIsLoading(false)
+        }, 2000)
+        return () => clearTimeout(showAlert)
+      } catch (err) {
+        alert(err)
+        setIsLoading(false)
+      }
     } else {
-      const showAlert = setTimeout(() => {
-        setShowToast(true)
-        setSuccessMessage('Edited Successfully')
-        setSaved(true)
-      }, 2000)
-      return () => clearTimeout(showAlert)
+      //dispatch(addNewInvoice(invoicePayload))
+      try {
+        await addDoc(collection(db, 'invoice'), invoicePayload)
+
+        const clearInputs = setTimeout(() => {
+          setInputs(initialInputState)
+          setErrors(initialInputState)
+          setItemList([
+            {
+              id: uuidv4(),
+              name: '',
+              quantity: '',
+              price: '',
+              total: 0,
+            },
+          ])
+          setItemErrors(false)
+          setShowToast(true)
+          setSuccessMessage('Invoice Created Successfully')
+          setIsLoading(false)
+          //dispatch(getInvoices())
+        }, 2000)
+        return () => clearTimeout(clearInputs)
+
+        //onClose()
+      } catch (err) {
+        alert(err)
+        setIsLoading(false)
+      }
     }
   }
 
@@ -309,7 +332,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
           'text-white': mode === 'dark',
         })}
       >
-        {type === 'edit' ? `Edit #${details?.id}` : 'New Invoice'}
+        {type === 'edit' ? `Edit #${details?.data?.id}` : 'New Invoice'}
       </h1>
       {showToast && <Toast type='success' message={successMessage} />}
 

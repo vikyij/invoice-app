@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Status from '../Status'
 import Modal from '../Modal'
-import { formatDate, formatAmount } from '../../utils/index.js'
+import {
+  formatDate,
+  formatAmount,
+  formatStringDate,
+} from '../../utils/index.js'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
 import { InvoiceData } from '../../redux/interfaces/invoice'
 import NewInvoice from '../NewInvoice'
@@ -11,6 +15,8 @@ import { AppState } from '../../redux/store'
 import { InlineLoader } from '../Loading'
 import classNames from 'classnames'
 import Toast from '../Toast'
+import { db } from '../../firebase'
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore'
 
 type InvoiceDetailsProps = {
   details: InvoiceData
@@ -46,42 +52,54 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
     }
   }, [singleInvoice])
 
-  const handlePaid = () => {
-    setMarkAsPaid(true)
+  const handlePaid = async () => {
+    //setMarkAsPaid(true)
     const invoicePayload = {
-      id: details?.id,
-      status: 'paid',
-      description: details?.description,
-      senderAddress: {
-        street: details?.senderAddress.street,
-        city: details?.senderAddress.city,
-        postCode: details?.senderAddress.postCode,
-        country: details?.senderAddress.country,
+      data: {
+        id: details?.data?.id,
+        status: 'paid',
+        description: details?.data?.description,
+        senderAddress: {
+          street: details?.data?.senderAddress.street,
+          city: details?.data?.senderAddress.city,
+          postCode: details?.data?.senderAddress.postCode,
+          country: details?.data?.senderAddress.country,
+        },
+        createdAt: details?.data?.createdAt,
+        paymentDue: details?.data?.paymentDue,
+        clientName: details?.data?.clientName,
+        clientAddress: {
+          street: details?.data?.clientAddress.street,
+          city: details?.data?.clientAddress.city,
+          postCode: details?.data?.clientAddress.postCode,
+          country: details?.data?.clientAddress.country,
+        },
+        clientEmail: details?.data?.clientEmail,
+        items: details?.data?.items,
+        total: details?.data?.total,
+        paymentTerms: details?.data?.paymentTerms,
       },
-      createdAt: details?.createdAt,
-      paymentDue: details?.paymentDue,
-      clientName: details?.clientName,
-      clientAddress: {
-        street: details?.clientAddress.street,
-        city: details?.clientAddress.city,
-        postCode: details?.clientAddress.postCode,
-        country: details?.clientAddress.country,
-      },
-      clientEmail: details?.clientEmail,
-      items: details?.items,
-      total: details?.total,
-      paymentTerms: details?.paymentTerms,
+      id: details.id,
     }
+    setIsLoading(true)
+    //dispatch(editInvoice(invoicePayload))
+    const taskDocRef = doc(db, 'invoice', invoiceDetails.id)
+    try {
+      await updateDoc(taskDocRef, {
+        status: 'paid',
+      })
+      const showAlert = setTimeout(() => {
+        setShowToast(true)
+        setSuccessMessage('Successful')
+        setMarkAsPaid(false)
+        setIsLoading(false)
+      }, 3000)
 
-    dispatch(editInvoice(invoicePayload))
-
-    const showAlert = setTimeout(() => {
-      setShowToast(true)
-      setSuccessMessage('Successful')
-      setMarkAsPaid(false)
-    }, 3000)
-
-    return () => clearTimeout(showAlert)
+      return () => clearTimeout(showAlert)
+    } catch (err) {
+      alert(err)
+      setIsLoading(false)
+    }
   }
 
   const handleGoBack = (newDetails?: InvoiceData) => {
@@ -91,21 +109,28 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
     }
   }
 
-  const handleDelete = (id?: string) => {
+  const handleDelete = async (id?: string) => {
     if (id) {
-      dispatch(deleteInvoiceApi(id))
-      const showAlert = setTimeout(() => {
+      //dispatch(deleteInvoiceApi(id))
+      setIsLoading(true)
+      const taskDocRef = doc(db, 'invoice', id)
+      try {
+        await deleteDoc(taskDocRef)
+
         setShowToast(true)
         setSuccessMessage('Deleted Successfully')
         setDeleteInvoice(false)
-      }, 2000)
+        setIsLoading(false)
+      } catch (err) {
+        alert(err)
+        setIsLoading(false)
+      }
 
       const goHome = setTimeout(() => {
         goBack()
       }, 7000)
 
       return () => {
-        clearTimeout(showAlert)
         clearTimeout(goHome)
       }
     }
@@ -161,16 +186,16 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
             >
               <div className='md:hidden flex justify-between w-full items-center'>
                 <p className='text-xs font-medium text-[#858BB2]'>Status</p>
-                <Status status={invoiceDetails?.status} mode={mode} />
+                <Status status={invoiceDetails?.data?.status} mode={mode} />
               </div>
 
               <div className='hidden md:flex justify-between items-center'>
                 <p className='text-xs font-medium text-[#858BB2] md:mr-3'>
                   Status
                 </p>
-                <Status status={invoiceDetails?.status} mode={mode} />
+                <Status status={invoiceDetails?.data?.status} mode={mode} />
               </div>
-              {invoiceDetails?.status !== 'paid' && (
+              {invoiceDetails?.data?.status !== 'paid' && (
                 <div
                   className={classNames(
                     'flex justify-between items-center p-6 hidden md:block',
@@ -234,7 +259,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                     >
                       #
                     </span>
-                    {invoiceDetails?.id}
+                    {invoiceDetails?.data?.id}
                   </p>
                   <p
                     className={classNames('font-medium text-xs ', {
@@ -242,7 +267,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                       'text-light-grey': mode === 'dark',
                     })}
                   >
-                    {invoiceDetails?.description}
+                    {invoiceDetails?.data?.description}
                   </p>
                 </div>
                 <section
@@ -254,10 +279,10 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                     }
                   )}
                 >
-                  <p>{invoiceDetails?.senderAddress.street}</p>
-                  <p>{invoiceDetails?.senderAddress.city}</p>
-                  <p>{invoiceDetails?.senderAddress.postCode}</p>
-                  <p>{invoiceDetails?.senderAddress.country}</p>
+                  <p>{invoiceDetails?.data?.senderAddress.street}</p>
+                  <p>{invoiceDetails?.data?.senderAddress.city}</p>
+                  <p>{invoiceDetails?.data?.senderAddress.postCode}</p>
+                  <p>{invoiceDetails?.data?.senderAddress.country}</p>
                 </section>
               </div>
               <div className='flex justify-between md:justify-evenly md:mt-4'>
@@ -276,7 +301,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                       'text-white': mode === 'dark',
                     })}
                   >
-                    {formatDate(invoiceDetails?.createdAt)}
+                    {formatStringDate(invoiceDetails?.data?.createdAt)}
                   </p>
 
                   <p
@@ -293,7 +318,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                       'text-white': mode === 'dark',
                     })}
                   >
-                    {formatDate(invoiceDetails?.paymentDue)}
+                    {formatDate(invoiceDetails?.data?.paymentDue)}
                   </p>
                 </section>
                 <section>
@@ -311,7 +336,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                       'text-white': mode === 'dark',
                     })}
                   >
-                    {invoiceDetails?.clientName}
+                    {invoiceDetails?.data?.clientName}
                   </p>
                   <section
                     className={classNames('font-medium text-xs', {
@@ -319,10 +344,10 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                       'text-light-grey': mode === 'dark',
                     })}
                   >
-                    <p>{invoiceDetails?.clientAddress.street}</p>
-                    <p>{invoiceDetails?.clientAddress.city}</p>
-                    <p>{invoiceDetails?.clientAddress.postCode}</p>
-                    <p>{invoiceDetails?.clientAddress.country}</p>
+                    <p>{invoiceDetails?.data?.clientAddress.street}</p>
+                    <p>{invoiceDetails?.data?.clientAddress.city}</p>
+                    <p>{invoiceDetails?.data?.clientAddress.postCode}</p>
+                    <p>{invoiceDetails?.data?.clientAddress.country}</p>
                   </section>
                 </section>
                 <section className='hidden md:block'>
@@ -340,7 +365,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                       'text-white': mode === 'dark',
                     })}
                   >
-                    {invoiceDetails?.clientEmail}
+                    {invoiceDetails?.data?.clientEmail}
                   </p>
                 </section>
               </div>
@@ -359,7 +384,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                     'text-white': mode === 'dark',
                   })}
                 >
-                  {invoiceDetails?.clientEmail}
+                  {invoiceDetails?.data?.clientEmail}
                 </p>
               </div>
               <section
@@ -379,7 +404,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                   <p className='font-medium text-xs text-grey-purple'>Price</p>
                   <p className='font-medium text-xs text-grey-purple'>Total</p>
                 </div>
-                {invoiceDetails?.items.map((item) => {
+                {invoiceDetails?.data?.items.map((item) => {
                   return (
                     <div
                       className='flex justify-between items-center pt-6'
@@ -464,13 +489,13 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
               >
                 <p className='font-medium text-xs text-white'>Grand Total</p>
                 <p className='font-bold text-xl text-white'>
-                  {formatAmount(invoiceDetails?.total)}
+                  {formatAmount(invoiceDetails?.data?.total)}
                 </p>
               </div>
             </div>
           </div>
 
-          {invoiceDetails?.status !== 'paid' && (
+          {invoiceDetails?.data?.status !== 'paid' && (
             <footer
               className={classNames(
                 'flex justify-between items-center p-6 md:hidden',
@@ -536,7 +561,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
             >
               Confirm Deletion
             </p>
-            <p className='font-normal text-xs text-dark-grey mt-3'>{`Are you sure you want to delete invoice #${invoiceDetails?.id}? This action cannot be undone.`}</p>
+            <p className='font-normal text-xs text-dark-grey mt-3'>{`Are you sure you want to delete invoice #${invoiceDetails?.data?.id}? This action cannot be undone.`}</p>
             <div className='mt-6 flex justify-end'>
               <button
                 className={classNames(
