@@ -14,38 +14,43 @@ import { Loading } from '../../components/Loading'
 import rightArrow from '../../assets/images/icon-arrow-right.svg'
 import Filter from '../../components/Filter'
 import './home.css'
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
+import { db } from '../../firebase'
 
 const initialSingleDetail = {
-  id: '',
-  status: '',
-  description: '',
-  senderAddress: {
-    street: '',
-    city: '',
-    postCode: '',
-    country: '',
-  },
-  createdAt: '',
-  paymentDue: new Date(),
-  clientName: '',
-  clientAddress: {
-    street: '',
-    city: '',
-    postCode: '',
-    country: '',
-  },
-  clientEmail: '',
-  items: [
-    {
-      id: '',
-      name: '',
-      quantity: '',
-      price: '',
-      total: 0,
+  data: {
+    id: '',
+    status: '',
+    description: '',
+    senderAddress: {
+      street: '',
+      city: '',
+      postCode: '',
+      country: '',
     },
-  ],
-  total: 0,
-  paymentTerms: '',
+    createdAt: '',
+    paymentDue: new Date(),
+    clientName: '',
+    clientAddress: {
+      street: '',
+      city: '',
+      postCode: '',
+      country: '',
+    },
+    clientEmail: '',
+    items: [
+      {
+        id: '',
+        name: '',
+        quantity: '',
+        price: '',
+        total: 0,
+      },
+    ],
+    total: 0,
+    paymentTerms: '',
+  },
+  id: '',
 }
 
 enum filterActionType {
@@ -104,9 +109,22 @@ const Home = ({ mode }: { mode: string }) => {
 
   const dispatch = useDispatch()
 
+  // useEffect(() => {
+  //   dispatch(getInvoices())
+  // }, [dispatch])
+
   useEffect(() => {
-    dispatch(getInvoices())
-  }, [dispatch])
+    const q = query(collection(db, 'invoice'), orderBy('created', 'desc'))
+    onSnapshot(q, (querySnapshot) => {
+      setInvoiceData(
+        // @ts-ignore
+        querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      )
+    })
+  }, [])
 
   const { invoices, loading } = useSelector((state: AppState) => state.invoices)
 
@@ -130,7 +148,7 @@ const Home = ({ mode }: { mode: string }) => {
       .map((value) => value[0])
 
     const filteredInvoiceData = invoiceData?.filter((invoice: InvoiceData) =>
-      filteredState.includes(invoice.status)
+      filteredState.includes(invoice.data.status)
     )
 
     setFilteredData(filteredInvoiceData)
@@ -162,7 +180,7 @@ const Home = ({ mode }: { mode: string }) => {
           details={singleDetail}
           goBack={() => {
             setShowDetails(false)
-            dispatch(getInvoices())
+            // dispatch(getInvoices())
           }}
           mode={mode}
         />
@@ -243,7 +261,7 @@ const Home = ({ mode }: { mode: string }) => {
                       }
                     )}
                     data-testid={`div-wrapper-${index}`}
-                    key={invoice.id}
+                    key={invoice.data.id}
                     onClick={() => handleShowDetails(invoice)}
                   >
                     <div className='md:hidden'>
@@ -262,7 +280,7 @@ const Home = ({ mode }: { mode: string }) => {
                           >
                             #
                           </span>
-                          {invoice.id}
+                          {invoice.data.id}
                         </p>
 
                         <p
@@ -271,7 +289,7 @@ const Home = ({ mode }: { mode: string }) => {
                             'text-white': mode === 'dark',
                           })}
                         >
-                          {invoice.clientName}
+                          {invoice.data.clientName}
                         </p>
                       </div>
                       <div className='flex justify-between mt-5'>
@@ -282,7 +300,7 @@ const Home = ({ mode }: { mode: string }) => {
                               'text-light-grey': mode === 'dark',
                             })}
                           >
-                            {`Due ${formatDate(invoice.paymentDue)}`}
+                            {`Due ${formatDate(invoice.data.paymentDue)}`}
                           </p>
                           <h2
                             className={classNames('font-bold text-base', {
@@ -290,10 +308,10 @@ const Home = ({ mode }: { mode: string }) => {
                               'text-white': mode === 'dark',
                             })}
                           >
-                            {formatAmount(invoice.total)}
+                            {formatAmount(invoice.data.total)}
                           </h2>
                         </div>
-                        <Status status={invoice.status} mode={mode} />
+                        <Status status={invoice.data.status} mode={mode} />
                       </div>
                     </div>
 
@@ -312,7 +330,7 @@ const Home = ({ mode }: { mode: string }) => {
                         >
                           #
                         </span>
-                        {invoice.id}
+                        {invoice.data.id}
                       </p>
                       <p
                         className={classNames('font-medium text-xs md:w-1/5', {
@@ -320,7 +338,7 @@ const Home = ({ mode }: { mode: string }) => {
                           'text-light-grey': mode === 'dark',
                         })}
                       >
-                        {`Due ${formatDate(invoice.paymentDue)}`}
+                        {`Due ${formatDate(invoice.data.paymentDue)}`}
                       </p>
                       <p
                         className={classNames('font-bold text-xs md:w-1/5', {
@@ -328,7 +346,7 @@ const Home = ({ mode }: { mode: string }) => {
                           'text-white': mode === 'dark',
                         })}
                       >
-                        {invoice.clientName}
+                        {invoice.data.clientName}
                       </p>
                       <h2
                         className={classNames(
@@ -339,10 +357,10 @@ const Home = ({ mode }: { mode: string }) => {
                           }
                         )}
                       >
-                        {formatAmount(invoice.total)}
+                        {formatAmount(invoice.data.total)}
                       </h2>
                       <div className='md:w-[10%]'>
-                        <Status status={invoice.status} mode={mode} />
+                        <Status status={invoice.data.status} mode={mode} />
                       </div>
 
                       <img src={rightArrow} alt='right arrow' />

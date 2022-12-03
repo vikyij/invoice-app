@@ -37,7 +37,7 @@ export const editInvoice = (data: InvoiceData) => {
   return function(dispatch: Dispatch<InvoiceActionTypes>) {
     dispatch(getInvoiceAction(invoiceStateTypes.LOADING, true))
 
-    fetch(`http://localhost:3000/invoices/${data.id}`, {
+    fetch(`http://localhost:3000/invoices/${data.data.id}`, {
       method: 'PATCH',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data)
