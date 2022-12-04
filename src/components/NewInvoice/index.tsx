@@ -13,14 +13,20 @@ import { getInvoices } from '../../redux/effect/invoice'
 import Toast from '../Toast'
 import Footer from '../Footer'
 import { db } from '../../firebase'
-import { collection, addDoc, Timestamp } from 'firebase/firestore'
-import { doc, updateDoc } from 'firebase/firestore'
+import {
+  collection,
+  addDoc,
+  Timestamp,
+  doc,
+  updateDoc,
+} from 'firebase/firestore'
 
 type NewInvoiceProps = {
   type: string
   details?: InvoiceData
   goBack: (newDetails?: InvoiceData) => void
   mode: string
+  handleSuccess?: () => void
 }
 
 type Items = {
@@ -52,6 +58,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
   type,
   details,
   mode,
+  handleSuccess,
 }) => {
   let initialInputState = {
     senderStreet: '',
@@ -128,6 +135,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
     if (!saved) {
       initialDetails()
     }
+    goBack()
   }
 
   const addNewItem = () => {
@@ -200,13 +208,15 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       try {
         await updateDoc(taskDocRef, invoicePayload)
 
-        const showAlert = setTimeout(() => {
+      
           setShowToast(true)
           setSuccessMessage('Edited Successfully')
           setSaved(true)
           setIsLoading(false)
-        }, 2000)
-        return () => clearTimeout(showAlert)
+          handleSuccess && handleSuccess()
+          goBack()
+       
+    
       } catch (err) {
         alert(err)
         setIsLoading(false)
@@ -215,8 +225,8 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       //dispatch(addNewInvoice(invoicePayload))
       try {
         await addDoc(collection(db, 'invoice'), invoicePayload)
-
-        const clearInputs = setTimeout(() => {
+        setIsLoading(false)
+      
           setInputs(initialInputState)
           setErrors(initialInputState)
           setItemList([
@@ -231,10 +241,10 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
           setItemErrors(false)
           setShowToast(true)
           setSuccessMessage('Invoice Created Successfully')
-          setIsLoading(false)
+          handleSuccess && handleSuccess()
+          goBack()
           //dispatch(getInvoices())
-        }, 2000)
-        return () => clearTimeout(clearInputs)
+     
 
         //onClose()
       } catch (err) {
