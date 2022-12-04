@@ -38,7 +38,7 @@ Users should be able to:
 ### Links
 
 - Solution URL: https://github.com/vikyij/invoice-app
-- Live Site URL: https://invoice-c6nx28o4e-vikyij.vercel.app/
+- Live Site URL: https://invoice-1fug6xodk-vikyij.vercel.app/
 
 
 ## My process
@@ -50,17 +50,16 @@ Users should be able to:
 - tailwind css
 - Mobile-first workflow
 - [React](https://reactjs.org/) - JS library
-- Redux
+- Context api
 - React testing library and jest
 
 
 
 ### What I learned
 
-Use this section to recap over some of your major learnings while working through this project. Writing these out and providing code samples of areas you want to highlight is a great way to reinforce your own knowledge.
 
 I learnt unit, integration and end to end testing with react testing library, jest and cypress
-I learnt how to make requests with json server and mock requests with msw
+I learnt how to make requests with json server and mock requests with msw, how to use firebase
 I learnt typescript
 
 ### Continued development
