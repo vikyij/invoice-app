@@ -3,13 +3,9 @@ import classNames from 'classnames'
 import plusIcon from '../../assets/images/icon-plus.svg'
 import EmptyState from '../../components/EmptyState'
 import Status from '../../components/Status'
-import InvoiceDetails from '../../components/InvoiceDetails'
 import NewInvoice from '../../components/NewInvoice'
 import { formatAmount, formatDate } from '../../utils/index.js'
-import { InvoiceData } from '../../redux/interfaces/invoice'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppState } from '../../redux/store'
-import { getInvoices } from '../../redux/effect/invoice'
+import { InvoiceData } from '../../utils/types'
 import { Loading } from '../../components/Loading'
 import rightArrow from '../../assets/images/icon-arrow-right.svg'
 import Filter from '../../components/Filter'
@@ -18,42 +14,6 @@ import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { Link } from 'react-router-dom'
 import Header from '../../components/Header'
-
-const initialSingleDetail = {
-  data: {
-    id: '',
-    status: '',
-    description: '',
-    senderAddress: {
-      street: '',
-      city: '',
-      postCode: '',
-      country: '',
-    },
-    createdAt: '',
-    paymentDue: new Date(),
-    clientName: '',
-    clientAddress: {
-      street: '',
-      city: '',
-      postCode: '',
-      country: '',
-    },
-    clientEmail: '',
-    items: [
-      {
-        id: '',
-        name: '',
-        quantity: '',
-        price: '',
-        total: 0,
-      },
-    ],
-    total: 0,
-    paymentTerms: '',
-  },
-  id: '',
-}
 
 enum filterActionType {
   draft = 'DRAFT',
@@ -96,9 +56,6 @@ const filterReducer = (state: filterState, action: filterAction) => {
 const Home = ({ mode }: { mode: string }) => {
   const [invoiceData, setInvoiceData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-  const [showDetails, setShowDetails] = useState(false)
-  const [singleDetail, setSingleDetail] =
-    useState<InvoiceData>(initialSingleDetail)
   const [showNewInvoice, setShowNewInvoice] = useState(false)
   const [showFilter, setShowfilter] = useState(false)
   const [filteredData, setFilteredData] = useState([])
@@ -109,15 +66,11 @@ const Home = ({ mode }: { mode: string }) => {
     initialFilterState
   )
 
-  const dispatch = useDispatch()
-
-  // useEffect(() => {
-  //   dispatch(getInvoices())
-  // }, [dispatch])
-
   useEffect(() => {
+    setIsLoading(true)
     const q = query(collection(db, 'invoice'), orderBy('created', 'desc'))
     onSnapshot(q, (querySnapshot) => {
+      setIsLoading(false)
       setInvoiceData(
         // @ts-ignore
         querySnapshot.docs.map((doc) => ({
@@ -127,18 +80,6 @@ const Home = ({ mode }: { mode: string }) => {
       )
     })
   }, [])
-
-  const { invoices, loading } = useSelector((state: AppState) => state.invoices)
-
-  const handleShowDetails = (invoice: InvoiceData) => {
-    setShowDetails(true)
-    setSingleDetail(invoice)
-  }
-
-  useEffect(() => {
-    setInvoiceData(invoices)
-    setIsLoading(loading)
-  }, [invoices, loading])
 
   const handleGoBack = () => {
     setShowNewInvoice(false)
@@ -174,19 +115,9 @@ const Home = ({ mode }: { mode: string }) => {
   const handlePaid = () => {
     filterDispatch({ type: filterActionType.paid })
   }
-  console.log(invoiceData)
   return (
     <>
-      {showDetails ? (
-        <InvoiceDetails
-          //details={singleDetail}
-          // goBack={() => {
-          //   setShowDetails(false)
-          //   // dispatch(getInvoices())
-          // }}
-          mode={mode}
-        />
-      ) : showNewInvoice && width < 700 ? (
+      {showNewInvoice && width < 700 ? (
         <NewInvoice goBack={handleGoBack} type='new' mode={mode} />
       ) : (
         <>
@@ -267,7 +198,6 @@ const Home = ({ mode }: { mode: string }) => {
                         )}
                         data-testid={`div-wrapper-${index}`}
                         key={invoice.data.id}
-                        //onClick={() => handleShowDetails(invoice)}
                       >
                         <div className='md:hidden'>
                           <div className='flex justify-between'>

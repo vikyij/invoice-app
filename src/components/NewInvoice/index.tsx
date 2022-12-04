@@ -3,13 +3,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { formatAmount } from '../../utils/index.js'
 import deleteIcon from '../../assets/images/icon-delete.svg'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
-import { useDispatch, useSelector } from 'react-redux'
-import { addNewInvoice, editInvoice } from '../../redux/effect/invoice'
-import { AppState } from '../../redux/store'
 import { InputValidation } from '../../utils/validationSchema'
-import { InvoiceData } from '../../redux/interfaces/invoice'
+import { InvoiceData } from '../../utils/types'
 import classNames from 'classnames'
-import { getInvoices } from '../../redux/effect/invoice'
 import Toast from '../Toast'
 import Footer from '../Footer'
 import { db } from '../../firebase'
@@ -24,7 +20,7 @@ import {
 type NewInvoiceProps = {
   type: string
   details?: InvoiceData
-  goBack: (newDetails?: InvoiceData) => void
+  goBack: () => void
   mode: string
   handleSuccess?: () => void
 }
@@ -93,14 +89,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
   const [width] = useState(window.innerWidth)
   const [showToast, setShowToast] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
-  const dispatch = useDispatch()
-  const { loading, singleInvoice } = useSelector(
-    (state: AppState) => state.invoices
-  )
-
-  useEffect(() => {
-    setIsLoading(loading)
-  }, [loading])
 
   const initialDetails = useCallback(() => {
     if (details) {
@@ -197,10 +185,8 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       paymentTerms: inputs?.paymentTerms,
       created: Timestamp.now(),
     }
-    console.log('here', invoicePayload)
     setIsLoading(true)
     if (type === 'edit') {
-      // dispatch(editInvoice(invoicePayload))
 
       const taskDocRef = details
         ? doc(db, 'invoice', details.id)
@@ -208,45 +194,38 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
       try {
         await updateDoc(taskDocRef, invoicePayload)
 
-      
-          setShowToast(true)
-          setSuccessMessage('Edited Successfully')
-          setSaved(true)
-          setIsLoading(false)
-          handleSuccess && handleSuccess()
-          goBack()
-       
-    
+        setShowToast(true)
+        setSuccessMessage('Edited Successfully')
+        setSaved(true)
+        setIsLoading(false)
+        handleSuccess && handleSuccess()
+        goBack()
       } catch (err) {
         alert(err)
         setIsLoading(false)
       }
     } else {
-      //dispatch(addNewInvoice(invoicePayload))
       try {
         await addDoc(collection(db, 'invoice'), invoicePayload)
         setIsLoading(false)
-      
-          setInputs(initialInputState)
-          setErrors(initialInputState)
-          setItemList([
-            {
-              id: uuidv4(),
-              name: '',
-              quantity: '',
-              price: '',
-              total: 0,
-            },
-          ])
-          setItemErrors(false)
-          setShowToast(true)
-          setSuccessMessage('Invoice Created Successfully')
-          handleSuccess && handleSuccess()
-          goBack()
-          //dispatch(getInvoices())
-     
 
-        //onClose()
+        setInputs(initialInputState)
+        setErrors(initialInputState)
+        setItemList([
+          {
+            id: uuidv4(),
+            name: '',
+            quantity: '',
+            price: '',
+            total: 0,
+          },
+        ])
+        setItemErrors(false)
+        setShowToast(true)
+        setSuccessMessage('Invoice Created Successfully')
+        handleSuccess && handleSuccess()
+        goBack()
+
       } catch (err) {
         alert(err)
         setIsLoading(false)
@@ -319,18 +298,14 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
             src={leftArrow}
             alt='back arrow icon'
             className='cursor-pointer'
-            onClick={() => {
-              type === 'new' ? goBack() : goBack(singleInvoice)
-            }}
+            onClick={() => goBack()}
           />
           <p
             className={classNames('font-bold text-xs ml-6 cursor-pointer', {
               'text-semi-black': mode === 'light',
               'text-white': mode === 'dark',
             })}
-            onClick={() => {
-              type === 'new' ? goBack() : goBack(singleInvoice)
-            }}
+            onClick={() => goBack()}
           >
             Go Back
           </p>
