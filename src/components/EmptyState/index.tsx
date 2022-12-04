@@ -1,7 +1,11 @@
 import classNames from 'classnames'
+import { useContext } from 'react'
 import emptyStateImg from '../../assets/images/illustration-empty.svg'
+import { ModeContext } from '../../App'
 
-const EmptyState = ({ mode }: { mode: string }) => {
+const EmptyState = () => {
+  const { mode } = useContext(ModeContext)
+
   return (
     <div className='flex flex-col justify-center items-center h-[66.5vh]'>
       <img src={emptyStateImg} alt='empty-state-illustration' />

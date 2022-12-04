@@ -1,15 +1,13 @@
-import React from 'react'
+import { useContext } from 'react'
 import ovalIcon from '../../assets/images/oval.svg'
 import moonIcon from '../../assets/images/icon-moon.svg'
 import userAvatar from '../../assets/images/image-avatar.jpg'
 import sunIcon from '../../assets/images/icon-sun.svg'
+import { ModeContext } from '../../App'
 
-interface HeaderProps {
-  mode: string
-  handleMode: (mode: string) => void
-}
+const Header = () => {
+  const { mode, setMode } = useContext(ModeContext)
 
-const Header: React.FC<HeaderProps> = ({ mode, handleMode }) => {
   return (
     <header className='w-full md:w-20 md:h-auto md:min-h-screen h-20 bg-dark-blue flex md:flex-col justify-between md:rounded-tr-3xl md:rounded-br-3xl'>
       <img src={ovalIcon} alt='left side header svg' />
@@ -18,14 +16,20 @@ const Header: React.FC<HeaderProps> = ({ mode, handleMode }) => {
         {mode === 'light' ? (
           <img
             src={moonIcon}
-            onClick={() => handleMode('dark')}
+            onClick={() => {
+              setMode('dark')
+              localStorage.setItem('mode', 'dark')
+            }}
             className='w-5 h-5 mr-6 md:mr-0 cursor-pointer'
             alt='moon icon'
           />
         ) : (
           <img
             src={sunIcon}
-            onClick={() => handleMode('light')}
+            onClick={() => {
+              setMode('light')
+              localStorage.setItem('mode', 'light')
+            }}
             className='w-5 h-5 mr-6 md:mr-0 cursor-pointer'
             alt='sun icon'
           />

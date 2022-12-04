@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { formatAmount } from '../../utils/index.js'
 import deleteIcon from '../../assets/images/icon-delete.svg'
@@ -16,12 +16,12 @@ import {
   doc,
   updateDoc,
 } from 'firebase/firestore'
+import { ModeContext } from '../../App'
 
 type NewInvoiceProps = {
   type: string
   details?: InvoiceData
   goBack: () => void
-  mode: string
   handleSuccess?: () => void
 }
 
@@ -53,7 +53,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
   goBack,
   type,
   details,
-  mode,
   handleSuccess,
 }) => {
   let initialInputState = {
@@ -187,7 +186,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
     }
     setIsLoading(true)
     if (type === 'edit') {
-
       const taskDocRef = details
         ? doc(db, 'invoice', details.id)
         : doc(db, 'invoice', '124')
@@ -225,7 +223,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
         setSuccessMessage('Invoice Created Successfully')
         handleSuccess && handleSuccess()
         goBack()
-
       } catch (err) {
         alert(err)
         setIsLoading(false)
@@ -280,7 +277,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation()
   }
-
+const {mode} = useContext(ModeContext)
   return (
     <div
       className={classNames(
@@ -963,7 +960,6 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({
         </div>
 
         <Footer
-          mode={mode}
           handleReset={handleReset}
           handleSaveChanges={handleSaveChanges}
           submitType={submitType}

@@ -1,11 +1,14 @@
 import classNames from 'classnames'
+import { useContext } from 'react'
+import { ModeContext } from '../../App'
 
 interface StatusProps {
   status?: string
-  mode: string
 }
 
-const Status: React.FC<StatusProps> = ({ status, mode }) => {
+const Status: React.FC<StatusProps> = ({ status }) => {
+  const { mode } = useContext(ModeContext)
+
   return (
     <div
       className={classNames(

@@ -1,8 +1,9 @@
 import classNames from 'classnames'
+import { useContext } from 'react'
 import { InlineLoader } from '../Loading'
+import { ModeContext } from '../../App'
 
 type FooterType = {
-  mode: string
   type: string
   submitType: string
   isLoading: boolean
@@ -13,7 +14,6 @@ type FooterType = {
 }
 
 const Footer = ({
-  mode,
   type,
   handleReset,
   handleSaveChanges,
@@ -22,6 +22,8 @@ const Footer = ({
   isLoading,
   handleSaveAsDraft,
 }: FooterType) => {
+  const { mode } = useContext(ModeContext)
+
   return (
     <footer
       className={classNames('flex justify-end items-center p-6 h-28 mt-10', {

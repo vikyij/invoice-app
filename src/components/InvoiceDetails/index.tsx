@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import Status from '../Status'
 import Modal from '../Modal'
 import {
@@ -17,12 +17,9 @@ import { doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Loading } from '../../components/Loading'
 import Header from '../../components/Header'
+import { ModeContext } from '../../App'
 
-type InvoiceDetailsProps = {
-  mode: string
-}
-
-const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
+const InvoiceDetails = () => {
   const [deleteInvoice, setDeleteInvoice] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -73,7 +70,6 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
         alert(err)
         setIsDeleteLoading(false)
       }
-
     }
   }
 
@@ -97,6 +93,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
     getInvoiceDetails()
   }, [invoiceId, editSuccessful])
 
+  const {mode }= useContext(ModeContext)
+
   return (
     <>
       {showEdit && width < 700 ? (
@@ -104,19 +102,18 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
           goBack={() => setShowEdit(false)}
           type='edit'
           details={invoiceDetails}
-          mode={mode}
           handleSuccess={() => setEditSuccessful(true)}
         />
       ) : (
         <>
-          <Header mode={mode} handleMode={() => {}} />
+          <Header />
           {isLoading ? (
             <div
               className={classNames(
                 'px-5 py-8 md:w-full md:my-[30px] md:mx-[100px]'
               )}
             >
-              <Loading mode={mode} />
+              <Loading />
             </div>
           ) : (
             <>
@@ -165,14 +162,14 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
                 >
                   <div className='md:hidden flex justify-between w-full items-center'>
                     <p className='text-xs font-medium text-[#858BB2]'>Status</p>
-                    <Status status={invoiceDetails?.data?.status} mode={mode} />
+                    <Status status={invoiceDetails?.data?.status} />
                   </div>
 
                   <div className='hidden md:flex justify-between items-center'>
                     <p className='text-xs font-medium text-[#858BB2] md:mr-3'>
                       Status
                     </p>
-                    <Status status={invoiceDetails?.data?.status} mode={mode} />
+                    <Status status={invoiceDetails?.data?.status} />
                   </div>
                   {invoiceDetails?.data?.status !== 'paid' && (
                     <div
@@ -543,7 +540,6 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
             goBack={() => setShowEdit(false)}
             type='edit'
             details={invoiceDetails}
-            mode={mode}
             handleSuccess={() => setEditSuccessful(true)}
           />
         </div>
