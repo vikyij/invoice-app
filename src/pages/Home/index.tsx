@@ -16,6 +16,8 @@ import Filter from '../../components/Filter'
 import './home.css'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { db } from '../../firebase'
+import { Link } from 'react-router-dom'
+import Header from '../../components/Header'
 
 const initialSingleDetail = {
   data: {
@@ -172,205 +174,219 @@ const Home = ({ mode }: { mode: string }) => {
   const handlePaid = () => {
     filterDispatch({ type: filterActionType.paid })
   }
-
+  console.log(invoiceData)
   return (
     <>
       {showDetails ? (
         <InvoiceDetails
-          details={singleDetail}
-          goBack={() => {
-            setShowDetails(false)
-            // dispatch(getInvoices())
-          }}
+          //details={singleDetail}
+          // goBack={() => {
+          //   setShowDetails(false)
+          //   // dispatch(getInvoices())
+          // }}
           mode={mode}
         />
       ) : showNewInvoice && width < 700 ? (
         <NewInvoice goBack={handleGoBack} type='new' mode={mode} />
       ) : (
-        <div
-          className={classNames(
-            'px-5 py-8 md:w-full md:my-[30px] md:mx-[100px]',
-            {
-              'bg-light-purple': mode === 'light',
-              'bg-black': mode === 'dark',
-            }
-          )}
-        >
-          <div className='flex justify-between items-center mb-8'>
-            <div>
-              <h1
-                className={classNames('font-bold text-2xl tracking-tighter', {
-                  'text-semi-black': mode === 'light',
-                  'text-white': mode === 'dark',
-                })}
-              >
-                Invoices
-              </h1>
-              <p className='text-dark-grey tracking-tight text-xs font-medium'>
-                {width > 700
-                  ? invoiceData?.length === 1
-                    ? 'There is 1 invoice'
-                    : `There are ${invoiceData?.length} invoices`
-                  : width < 700 && invoiceData?.length === 1
-                  ? '1 invoice'
-                  : `${invoiceData?.length} invoices`}
-              </p>
-            </div>
-            <div className='flex items-center'>
-              <Filter
-                mode={mode}
-                showFilter={showFilter}
-                filterState={filterState}
-                handleFilter={handleFilter}
-                handleDraft={handleDraft}
-                handlePending={handlePending}
-                handlePaid={handlePaid}
-              />
-
-              <div
-                className='w-[90px] md:w-[150px] h-10 rounded-3xl bg-purple flex items-center cursor-pointer'
-                onClick={() => setShowNewInvoice(true)}
-              >
-                <div className='w-8 h-8 bg-white rounded-3xl ml-1.5 mr-1.5'>
-                  <img
-                    src={plusIcon}
-                    className='p-2.5'
-                    alt='add-new-invoice-icon'
-                  />
-                </div>
-                <p className='text-white font-bold text-xs'>
-                  {width > 700 ? `New invoice` : `New`}
+        <>
+          <Header mode={mode} handleMode={() => {}} />
+          <div
+            className={classNames(
+              'px-5 py-8 md:w-full md:my-[30px] md:mx-[100px]',
+              {
+                'bg-light-purple': mode === 'light',
+                'bg-black': mode === 'dark',
+              }
+            )}
+          >
+            <div className='flex justify-between items-center mb-8'>
+              <div>
+                <h1
+                  className={classNames('font-bold text-2xl tracking-tighter', {
+                    'text-semi-black': mode === 'light',
+                    'text-white': mode === 'dark',
+                  })}
+                >
+                  Invoices
+                </h1>
+                <p className='text-dark-grey tracking-tight text-xs font-medium'>
+                  {width > 700
+                    ? invoiceData?.length === 1
+                      ? 'There is 1 invoice'
+                      : `There are ${invoiceData?.length} invoices`
+                    : width < 700 && invoiceData?.length === 1
+                    ? '1 invoice'
+                    : `${invoiceData?.length} invoices`}
                 </p>
               </div>
-            </div>
-          </div>
-          <>
-            {isLoading ? (
-              <Loading mode={mode} />
-            ) : invoiceData?.length === 0 ? (
-              <EmptyState mode={mode} />
-            ) : (
-              displayData?.map((invoice: InvoiceData, index) => {
-                return (
-                  <div
-                    className={classNames(
-                      'w-full h-36 md:h-[72px] rounded-lg  mt-4 p-4 py-6 md:py-0 md:px-6 cursor-pointer',
-                      {
-                        'bg-white': mode === 'light',
-                        'bg-dark-purple': mode === 'dark',
-                      }
-                    )}
-                    data-testid={`div-wrapper-${index}`}
-                    key={invoice.data.id}
-                    onClick={() => handleShowDetails(invoice)}
-                  >
-                    <div className='md:hidden'>
-                      <div className='flex justify-between'>
-                        <p
-                          className={classNames('font-bold text-xs', {
-                            'text-semi-black': mode === 'light',
-                            'text-white': mode === 'dark',
-                          })}
-                        >
-                          <span
-                            className={classNames({
-                              'text-dark-grey': mode === 'light',
-                              'text-grey-purple': mode === 'dark',
-                            })}
-                          >
-                            #
-                          </span>
-                          {invoice.data.id}
-                        </p>
+              <div className='flex items-center'>
+                <Filter
+                  mode={mode}
+                  showFilter={showFilter}
+                  filterState={filterState}
+                  handleFilter={handleFilter}
+                  handleDraft={handleDraft}
+                  handlePending={handlePending}
+                  handlePaid={handlePaid}
+                />
 
-                        <p
-                          className={classNames('font-bold text-xs', {
-                            'text-dark-grey': mode === 'light',
-                            'text-white': mode === 'dark',
-                          })}
-                        >
-                          {invoice.data.clientName}
-                        </p>
-                      </div>
-                      <div className='flex justify-between mt-5'>
-                        <div>
+                <div
+                  className='w-[90px] md:w-[150px] h-10 rounded-3xl bg-purple flex items-center cursor-pointer'
+                  onClick={() => setShowNewInvoice(true)}
+                >
+                  <div className='w-8 h-8 bg-white rounded-3xl ml-1.5 mr-1.5'>
+                    <img
+                      src={plusIcon}
+                      className='p-2.5'
+                      alt='add-new-invoice-icon'
+                    />
+                  </div>
+                  <p className='text-white font-bold text-xs'>
+                    {width > 700 ? `New invoice` : `New`}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <>
+              {isLoading ? (
+                <Loading mode={mode} />
+              ) : invoiceData?.length === 0 ? (
+                <EmptyState mode={mode} />
+              ) : (
+                displayData?.map((invoice: InvoiceData, index) => {
+                  return (
+                    <Link to={`/invoice/${invoice.id}`}>
+                      <div
+                        className={classNames(
+                          'w-full h-36 md:h-[72px] rounded-lg  mt-4 p-4 py-6 md:py-0 md:px-6 cursor-pointer',
+                          {
+                            'bg-white': mode === 'light',
+                            'bg-dark-purple': mode === 'dark',
+                          }
+                        )}
+                        data-testid={`div-wrapper-${index}`}
+                        key={invoice.data.id}
+                        //onClick={() => handleShowDetails(invoice)}
+                      >
+                        <div className='md:hidden'>
+                          <div className='flex justify-between'>
+                            <p
+                              className={classNames('font-bold text-xs', {
+                                'text-semi-black': mode === 'light',
+                                'text-white': mode === 'dark',
+                              })}
+                            >
+                              <span
+                                className={classNames({
+                                  'text-dark-grey': mode === 'light',
+                                  'text-grey-purple': mode === 'dark',
+                                })}
+                              >
+                                #
+                              </span>
+                              {invoice.data.id}
+                            </p>
+
+                            <p
+                              className={classNames('font-bold text-xs', {
+                                'text-dark-grey': mode === 'light',
+                                'text-white': mode === 'dark',
+                              })}
+                            >
+                              {invoice.data.clientName}
+                            </p>
+                          </div>
+                          <div className='flex justify-between mt-5'>
+                            <div>
+                              <p
+                                className={classNames('font-medium text-xs', {
+                                  'text-dark-grey': mode === 'light',
+                                  'text-light-grey': mode === 'dark',
+                                })}
+                              >
+                                {`Due ${formatDate(invoice.data.paymentDue)}`}
+                              </p>
+                              <h2
+                                className={classNames('font-bold text-base', {
+                                  'text-semi-black': mode === 'light',
+                                  'text-white': mode === 'dark',
+                                })}
+                              >
+                                {formatAmount(invoice.data.total)}
+                              </h2>
+                            </div>
+                            <Status status={invoice.data.status} mode={mode} />
+                          </div>
+                        </div>
+
+                        <div className='hidden md:flex justify-between md:items-center md:h-full'>
                           <p
-                            className={classNames('font-medium text-xs', {
-                              'text-dark-grey': mode === 'light',
-                              'text-light-grey': mode === 'dark',
-                            })}
+                            className={classNames(
+                              'font-bold text-xs md:w-[10%]',
+                              {
+                                'text-semi-black': mode === 'light',
+                                'text-white': mode === 'dark',
+                              }
+                            )}
+                          >
+                            <span
+                              className={classNames({
+                                'text-dark-grey': mode === 'light',
+                                'text-grey-purple': mode === 'dark',
+                              })}
+                            >
+                              #
+                            </span>
+                            {invoice.data.id}
+                          </p>
+                          <p
+                            className={classNames(
+                              'font-medium text-xs md:w-1/5',
+                              {
+                                'text-dark-grey': mode === 'light',
+                                'text-light-grey': mode === 'dark',
+                              }
+                            )}
                           >
                             {`Due ${formatDate(invoice.data.paymentDue)}`}
                           </p>
+                          <p
+                            className={classNames(
+                              'font-bold text-xs md:w-1/5',
+                              {
+                                'text-dark-grey': mode === 'light',
+                                'text-white': mode === 'dark',
+                              }
+                            )}
+                          >
+                            {invoice.data.clientName}
+                          </p>
                           <h2
-                            className={classNames('font-bold text-base', {
-                              'text-semi-black': mode === 'light',
-                              'text-white': mode === 'dark',
-                            })}
+                            className={classNames(
+                              'font-bold text-base md:w-[15%]',
+                              {
+                                'text-semi-black': mode === 'light',
+                                'text-white': mode === 'dark',
+                              }
+                            )}
                           >
                             {formatAmount(invoice.data.total)}
                           </h2>
+                          <div className='md:w-[10%]'>
+                            <Status status={invoice.data.status} mode={mode} />
+                          </div>
+
+                          <img src={rightArrow} alt='right arrow' />
                         </div>
-                        <Status status={invoice.data.status} mode={mode} />
                       </div>
-                    </div>
-
-                    <div className='hidden md:flex justify-between md:items-center md:h-full'>
-                      <p
-                        className={classNames('font-bold text-xs md:w-[10%]', {
-                          'text-semi-black': mode === 'light',
-                          'text-white': mode === 'dark',
-                        })}
-                      >
-                        <span
-                          className={classNames({
-                            'text-dark-grey': mode === 'light',
-                            'text-grey-purple': mode === 'dark',
-                          })}
-                        >
-                          #
-                        </span>
-                        {invoice.data.id}
-                      </p>
-                      <p
-                        className={classNames('font-medium text-xs md:w-1/5', {
-                          'text-dark-grey': mode === 'light',
-                          'text-light-grey': mode === 'dark',
-                        })}
-                      >
-                        {`Due ${formatDate(invoice.data.paymentDue)}`}
-                      </p>
-                      <p
-                        className={classNames('font-bold text-xs md:w-1/5', {
-                          'text-dark-grey': mode === 'light',
-                          'text-white': mode === 'dark',
-                        })}
-                      >
-                        {invoice.data.clientName}
-                      </p>
-                      <h2
-                        className={classNames(
-                          'font-bold text-base md:w-[15%]',
-                          {
-                            'text-semi-black': mode === 'light',
-                            'text-white': mode === 'dark',
-                          }
-                        )}
-                      >
-                        {formatAmount(invoice.data.total)}
-                      </h2>
-                      <div className='md:w-[10%]'>
-                        <Status status={invoice.data.status} mode={mode} />
-                      </div>
-
-                      <img src={rightArrow} alt='right arrow' />
-                    </div>
-                  </div>
-                )
-              })
-            )}
-          </>
-        </div>
+                    </Link>
+                  )
+                })
+              )}
+            </>
+          </div>
+        </>
       )}
 
       {showNewInvoice && width > 700 && (

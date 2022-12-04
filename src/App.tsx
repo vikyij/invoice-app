@@ -2,6 +2,8 @@ import { useState } from 'react'
 import classNames from 'classnames'
 import Header from './components/Header'
 import Home from './pages/Home'
+import InvoiceDetails from './components/InvoiceDetails'
+import { createBrowserRouter, RouterProvider, Route } from 'react-router-dom'
 
 const App = () => {
   let selectedMode = localStorage.getItem('mode')
@@ -18,7 +20,16 @@ const App = () => {
       localStorage.setItem('mode', 'dark')
     }
   }
-
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Home mode={mode} />,
+    },
+    {
+      path: 'invoice/:invoiceId',
+      element: <InvoiceDetails mode={mode} />,
+    },
+  ])
   return (
     <div
       className={classNames('h-screen md:h-full md:flex', {
@@ -26,8 +37,7 @@ const App = () => {
         'bg-black': mode === 'dark',
       })}
     >
-      <Header mode={mode} handleMode={handleMode} />
-      <Home mode={mode} />
+      <RouterProvider router={router} />
     </div>
   )
 }
