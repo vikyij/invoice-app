@@ -1,7 +1,10 @@
 import classNames from 'classnames'
+import { useContext } from 'react'
 import './inlineloader.css'
+import { ModeContext } from '../../App'
 
-export const Loading = ({ mode }: { mode: string }) => {
+export const Loading = () => {
+  const { mode } = useContext(ModeContext)
   return (
     <>
       {[...Array(4)].map((i, index) => {

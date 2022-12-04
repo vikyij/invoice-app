@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import classNames from 'classnames'
 import downArrow from '../../assets/images/icon-arrow-down.svg'
 import checkIcon from '../../assets/images/icon-check.svg'
+import { ModeContext } from '../../App'
 
 type FilterProps = {
-  mode: string
   showFilter: boolean
   filterState: { draft: boolean; pending: boolean; paid: boolean }
   handleFilter: () => void
@@ -14,7 +14,6 @@ type FilterProps = {
 }
 
 const Filter = ({
-  mode,
   showFilter,
   filterState,
   handleFilter,
@@ -23,6 +22,7 @@ const Filter = ({
   handlePaid,
 }: FilterProps) => {
   const [width] = useState(window.innerWidth)
+  const { mode } = useContext(ModeContext)
 
   return (
     <div className='mr-4 md:mr-7 flex flex-col items-center'>

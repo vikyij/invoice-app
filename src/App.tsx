@@ -1,8 +1,17 @@
-import { useState } from 'react'
+import { createContext, Dispatch, useState } from 'react'
 import classNames from 'classnames'
 import Home from './pages/Home'
 import InvoiceDetails from './components/InvoiceDetails'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+
+type ContextType = {
+  mode: string
+  setMode: Dispatch<React.SetStateAction<string>>
+}
+export const ModeContext = createContext<ContextType>({
+  mode: '',
+  setMode: () => {},
+})
 
 const App = () => {
   let selectedMode = localStorage.getItem('mode')
@@ -11,22 +20,14 @@ const App = () => {
     selectedMode === null ? 'light' : selectedMode
   )
 
-  const handleMode = (mode: string) => {
-    setMode(mode)
-    if (mode === 'light') {
-      localStorage.setItem('mode', 'light')
-    } else {
-      localStorage.setItem('mode', 'dark')
-    }
-  }
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Home mode={mode} />,
+      element: <Home />,
     },
     {
       path: 'invoice/:invoiceId',
-      element: <InvoiceDetails mode={mode} />,
+      element: <InvoiceDetails />,
     },
   ])
   return (
@@ -36,7 +37,9 @@ const App = () => {
         'bg-black': mode === 'dark',
       })}
     >
-      <RouterProvider router={router} />
+      <ModeContext.Provider value={{ mode, setMode }}>
+        <RouterProvider router={router} />
+      </ModeContext.Provider>
     </div>
   )
 }

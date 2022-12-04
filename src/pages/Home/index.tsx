@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer } from 'react'
+import { useState, useEffect, useReducer, useContext } from 'react'
 import classNames from 'classnames'
 import plusIcon from '../../assets/images/icon-plus.svg'
 import EmptyState from '../../components/EmptyState'
@@ -14,6 +14,7 @@ import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { Link } from 'react-router-dom'
 import Header from '../../components/Header'
+import { ModeContext } from '../../App'
 
 enum filterActionType {
   draft = 'DRAFT',
@@ -53,7 +54,7 @@ const filterReducer = (state: filterState, action: filterAction) => {
   }
 }
 
-const Home = ({ mode }: { mode: string }) => {
+const Home = () => {
   const [invoiceData, setInvoiceData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [showNewInvoice, setShowNewInvoice] = useState(false)
@@ -115,13 +116,17 @@ const Home = ({ mode }: { mode: string }) => {
   const handlePaid = () => {
     filterDispatch({ type: filterActionType.paid })
   }
+
+  const { mode } = useContext(ModeContext)
+
+  console.log(mode)
   return (
     <>
       {showNewInvoice && width < 700 ? (
-        <NewInvoice goBack={handleGoBack} type='new' mode={mode} />
+        <NewInvoice goBack={handleGoBack} type='new' />
       ) : (
         <>
-          <Header mode={mode} handleMode={() => {}} />
+          <Header />
           <div
             className={classNames(
               'px-5 py-8 md:w-full md:my-[30px] md:mx-[100px]',
@@ -153,7 +158,6 @@ const Home = ({ mode }: { mode: string }) => {
               </div>
               <div className='flex items-center'>
                 <Filter
-                  mode={mode}
                   showFilter={showFilter}
                   filterState={filterState}
                   handleFilter={handleFilter}
@@ -181,13 +185,13 @@ const Home = ({ mode }: { mode: string }) => {
             </div>
             <>
               {isLoading ? (
-                <Loading mode={mode} />
+                <Loading />
               ) : invoiceData?.length === 0 ? (
-                <EmptyState mode={mode} />
+                <EmptyState />
               ) : (
                 displayData?.map((invoice: InvoiceData, index) => {
                   return (
-                    <Link to={`/invoice/${invoice.id}`}>
+                    <Link to={`/invoice/${invoice.id}`}  key={invoice.data.id}>
                       <div
                         className={classNames(
                           'w-full h-36 md:h-[72px] rounded-lg  mt-4 p-4 py-6 md:py-0 md:px-6 cursor-pointer',
@@ -197,7 +201,6 @@ const Home = ({ mode }: { mode: string }) => {
                           }
                         )}
                         data-testid={`div-wrapper-${index}`}
-                        key={invoice.data.id}
                       >
                         <div className='md:hidden'>
                           <div className='flex justify-between'>
@@ -246,7 +249,7 @@ const Home = ({ mode }: { mode: string }) => {
                                 {formatAmount(invoice.data.total)}
                               </h2>
                             </div>
-                            <Status status={invoice.data.status} mode={mode} />
+                            <Status status={invoice.data.status} />
                           </div>
                         </div>
 
@@ -304,7 +307,7 @@ const Home = ({ mode }: { mode: string }) => {
                             {formatAmount(invoice.data.total)}
                           </h2>
                           <div className='md:w-[10%]'>
-                            <Status status={invoice.data.status} mode={mode} />
+                            <Status status={invoice.data.status} />
                           </div>
 
                           <img src={rightArrow} alt='right arrow' />
@@ -324,7 +327,7 @@ const Home = ({ mode }: { mode: string }) => {
           className='invoice-overlay'
           onClick={() => setShowNewInvoice(false)}
         >
-          <NewInvoice goBack={handleGoBack} type='new' mode={mode} />
+          <NewInvoice goBack={handleGoBack} type='new' />
         </div>
       )}
     </>
