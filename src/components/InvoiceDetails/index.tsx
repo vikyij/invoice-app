@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import Status from '../Status'
 import Modal from '../Modal'
 import {
@@ -8,10 +7,8 @@ import {
   formatStringDate,
 } from '../../utils/index.js'
 import leftArrow from '../../assets/images/icon-arrow-left.svg'
-import { InvoiceData } from '../../redux/interfaces/invoice'
+import { InvoiceData } from '../../utils/types'
 import NewInvoice from '../NewInvoice'
-import { editInvoice, deleteInvoiceApi } from '../../redux/effect/invoice'
-import { AppState } from '../../redux/store'
 import { InlineLoader } from '../Loading'
 import classNames from 'classnames'
 import Toast from '../Toast'
@@ -22,8 +19,6 @@ import { Loading } from '../../components/Loading'
 import Header from '../../components/Header'
 
 type InvoiceDetailsProps = {
-  //details: InvoiceData
-  // goBack: () => void
   mode: string
 }
 
@@ -36,56 +31,15 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
   const [width] = useState(window.innerWidth)
   const [showToast, setShowToast] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
-  const dispatch = useDispatch()
-  const { loading, singleInvoice } = useSelector(
-    (state: AppState) => state.invoices
-  )
+
   const [editSuccessful, setEditSuccessful] = useState(false)
   const [isDeleteLoading, setIsDeleteLoading] = useState(false)
   const { invoiceId } = useParams()
 
-  useEffect(() => {
-    setIsLoading(loading)
-  }, [loading])
-
   const navigate = useNavigate()
-  // useEffect(() => {
-  //   if (singleInvoice !== undefined) {
-  //     setInvoiceDetails(singleInvoice)
-  //   }
-  // }, [singleInvoice])
 
   const handlePaid = async () => {
-    //setMarkAsPaid(true)
-    // const invoicePayload = {
-    //   data: {
-    //     id: details?.data?.id,
-    //     status: 'paid',
-    //     description: details?.data?.description,
-    //     senderAddress: {
-    //       street: details?.data?.senderAddress.street,
-    //       city: details?.data?.senderAddress.city,
-    //       postCode: details?.data?.senderAddress.postCode,
-    //       country: details?.data?.senderAddress.country,
-    //     },
-    //     createdAt: details?.data?.createdAt,
-    //     paymentDue: details?.data?.paymentDue,
-    //     clientName: details?.data?.clientName,
-    //     clientAddress: {
-    //       street: details?.data?.clientAddress.street,
-    //       city: details?.data?.clientAddress.city,
-    //       postCode: details?.data?.clientAddress.postCode,
-    //       country: details?.data?.clientAddress.country,
-    //     },
-    //     clientEmail: details?.data?.clientEmail,
-    //     items: details?.data?.items,
-    //     total: details?.data?.total,
-    //     paymentTerms: details?.data?.paymentTerms,
-    //   },
-    //   id: details.id,
-    // }
     setIsLoading(true)
-    //dispatch(editInvoice(invoicePayload))
     // @ts-ignore
     const taskDocRef = doc(db, 'invoice', invoiceId)
     try {
@@ -102,17 +56,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
       setIsLoading(false)
     }
   }
-
-  const handleGoBack = (newDetails?: InvoiceData) => {
-    setShowEdit(false)
-    if (newDetails) {
-      setInvoiceDetails(newDetails)
-    }
-  }
-
   const handleDelete = async (id?: string) => {
     if (id) {
-      //dispatch(deleteInvoiceApi(id))
       setIsDeleteLoading(true)
       const taskDocRef = doc(db, 'invoice', id)
       try {
@@ -129,13 +74,6 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
         setIsDeleteLoading(false)
       }
 
-      // const goHome = setTimeout(() => {
-      //   goBack()
-      // }, 7000)
-
-      // return () => {
-      //   clearTimeout(goHome)
-      // }
     }
   }
 
@@ -152,7 +90,6 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
       })
       setIsLoading(false)
     } else {
-      // doc.data() will be undefined in this case
       setIsLoading(false)
     }
   }
@@ -164,7 +101,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
     <>
       {showEdit && width < 700 ? (
         <NewInvoice
-          goBack={handleGoBack}
+          goBack={() => setShowEdit(false)}
           type='edit'
           details={invoiceDetails}
           mode={mode}
@@ -603,7 +540,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ mode }) => {
       {showEdit && width > 700 && (
         <div className='invoice-overlay' onClick={() => setShowEdit(false)}>
           <NewInvoice
-            goBack={handleGoBack}
+            goBack={() => setShowEdit(false)}
             type='edit'
             details={invoiceDetails}
             mode={mode}

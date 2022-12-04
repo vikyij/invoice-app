@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import classNames from 'classnames'
-import Header from './components/Header'
 import Home from './pages/Home'
 import InvoiceDetails from './components/InvoiceDetails'
-import { createBrowserRouter, RouterProvider, Route } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 const App = () => {
   let selectedMode = localStorage.getItem('mode')
